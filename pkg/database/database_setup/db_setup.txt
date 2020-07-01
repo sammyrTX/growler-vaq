@@ -1,0 +1,45 @@
+"""SQL code to create the database infrastructure for the
+accounting system web app from scratch"""
+
+##################################################
+
+# Create the database
+
+CREATE DATABASE acctg_system;
+
+##################################################
+
+##################################################
+
+# Tables
+
+tables to create (from rhino_striker)
+"""
+class ChartOfAccounts(db.Model):
+class Departments(db.Model):
+class Periods(db.Model):
+class Group(db.Model):
+class JournalNames(db.Model):
+class Journal(db.Model):
+class Journal_Loader(db.Model):
+class GeneralLedger(db.Model):
+class GeneralLedger_Staging(db.Model):
+class Entity(db.Model):
+class Currency(db.Model):
+class JournalBatch(db.Model):
+class Xref_Batch_JE(db.Model):
+class Xref_Batch_GL(db.Model):
+class Xref_Batch_GL_Staging(db.Model):
+class AccountingUsers(db.Model, UserMixin):
+class User(db.Model, UserMixin):
+class BlogPost(db.Model):
+"""
+
+CREATE TABLE ChartOfAccounts (
+id INT AUTO INCREMENT PRIMARY KEY,
+account_number INT UNIQUE,
+account_name VARCHAR(50) UNIQUE,
+account_type INT
+);
+
+##################################################
