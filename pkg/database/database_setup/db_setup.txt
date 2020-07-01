@@ -36,7 +36,7 @@ class BlogPost(db.Model):
 """
 
 CREATE TABLE ChartOfAccounts (
-id INT AUTO INCREMENT PRIMARY KEY,
+id INT AUTO_INCREMENT PRIMARY KEY,
 account_number INT UNIQUE,
 account_name VARCHAR(50) UNIQUE,
 account_type INT
