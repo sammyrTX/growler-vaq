@@ -15,13 +15,6 @@ CREATE DATABASE acctg_system;
 
 tables to create (from rhino_striker)
 """
-class ChartOfAccounts(db.Model):
-class Departments(db.Model):
-class Periods(db.Model):
-class Group(db.Model):
-class JournalNames(db.Model):
-class Journal(db.Model):
-class Journal_Loader(db.Model):
 class GeneralLedger(db.Model):
 class GeneralLedger_Staging(db.Model):
 class Entity(db.Model):
@@ -33,13 +26,74 @@ class Xref_Batch_GL_Staging(db.Model):
 class AccountingUsers(db.Model, UserMixin):
 class User(db.Model, UserMixin):
 class BlogPost(db.Model):
+
+-- DONE --
+
+class ChartOfAccounts(db.Model):
+class Departments(db.Model):
+class Periods(db.Model):
+class Group(db.Model):
+class JournalNames(db.Model):
+class Journal(db.Model):
+class Journal_Loader(db.Model):
+
 """
 
-CREATE TABLE ChartOfAccounts (
+CREATE TABLE chart_of_accounts (
 id INT AUTO_INCREMENT PRIMARY KEY,
 account_number INT UNIQUE,
 account_name VARCHAR(50) UNIQUE,
 account_type INT
 );
+
+CREATE TABLE departments (
+id INT AUTO_INCREMENT PRIMARY KEY,
+department_number INT UNIQUE,
+department_name VARCHAR(50) UNIQUE
+);
+
+CREATE TABLE periods (
+period INT PRIMARY KEY,
+period_description CHAR(8) UNIQUE,
+period_begin CHAR(10) UNIQUE,
+period_end CHAR(10) UNIQUE
+);
+
+CREATE TABLE group_tbl (
+id INT AUTO_INCREMENT PRIMARY KEY,
+group_number INT UNIQUE,
+account_id INT,   # Need to use account id as foreign key
+account_name VARCHAR(50)
+);
+
+CREATE TABLE group_tbl (
+id INT AUTO_INCREMENT PRIMARY KEY,
+group_number INT UNIQUE,
+account_id INT,
+account_name VARCHAR(50)
+);
+
+CREATE TABLE journal_names (
+id INT AUTO_INCREMENT PRIMARY KEY,
+journal_name VARCHAR(50)
+);
+
+CREATE TABLE journals (
+journal_id INT AUTO_INCREMENT PRIMARY KEY,
+journal_name VARCHAR(50),
+journal_date VARCHAR(20),
+account_number INT,
+department_number INT,
+journal_entry_type INT,
+journal_debit FLOAT,
+journal_credit FLOAT,
+journal_description VARCHAR(100),
+journal_reference VARCHAR(30),
+journal_batch_id VARCHAR(30),
+gl_post_reference VARCHAR(20),
+journal_entity INT,
+journal_currency INT
+);
+
 
 ##################################################
