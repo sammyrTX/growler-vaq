@@ -60,8 +60,6 @@ if __name__ == '__main__':
     webdev_pw = '*** Need Password ***'
     connection = create_connection("localhost", "webdev", webdev_pw, "acctg_system")
 
-    # select_accts = "SELECT * FROM accounts_old"
-    # select_accts = "SELECT * FROM chart_of_accounts"
     execute_query(connection, load_accounts)
 
     print('*** End ***')

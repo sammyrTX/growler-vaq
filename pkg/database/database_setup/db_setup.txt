@@ -167,7 +167,7 @@ by Geography (e.g. North America, APAC, United Kingdom). Or regional
 one currency per entity.
 """
 CREATE TABLE entity (
-entity_id INT PRIMARY KEY,
+entity_id INT AUTO_INCREMENT PRIMARY KEY,
 entity_name VARCHAR(50),
 entity_currency CHAR(3)
 );
@@ -178,7 +178,7 @@ in USD (this system assumes USD is the local currency for the organiza-
 tion. Should be easy to change if required.)
 """
 CREATE TABLE currency (
-currency_id INT PRIMARY KEY,
+currency_id INT AUTO_INCREMENT PRIMARY KEY,
 currency_code CHAR(3),
 currency_description VARCHAR(30)
 );
