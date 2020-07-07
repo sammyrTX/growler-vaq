@@ -49,6 +49,9 @@ def execute_query(connection, query):
 
 
 if __name__ == '__main__':
+    """Populate tables that will be part of the accounting web app
+    database system.
+    """
 
     webdev_pw = '*** Need password ***'
 

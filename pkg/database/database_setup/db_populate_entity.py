@@ -1,6 +1,6 @@
 # db_populate_entity.py
 
-"""load data for currency table"""
+"""load data for entity table"""
 
 from db_test import create_connection, execute_query
 
