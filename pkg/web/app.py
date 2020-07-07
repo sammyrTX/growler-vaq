@@ -4,9 +4,12 @@ from flask import (Flask,
                    render_template,
                    redirect,
                    url_for,
+                   flash,
+                   request,
+                   Blueprint,
                    )
 
-from .. web.accounting_app.accounting_app import accounting_app_bp
+from .. web.accounting_app.accounting_app import accounting_app
 
 # Code from dice game web app. Replicate imports for accounting system
 # from . forms import (DiceHold,
@@ -34,7 +37,7 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'toASMuE59soIk7de34fJ&&'
 
-app.register_blueprint(accounting_app_bp, url_prefix='/accounting_app')
+app.register_blueprint(accounting_app, url_prefix='/accounting_app')
 
 
 @app.route('/')
