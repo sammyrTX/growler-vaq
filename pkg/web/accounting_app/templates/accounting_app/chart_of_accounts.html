@@ -24,10 +24,11 @@
       {% for acct in coa %}
       <tr>
         <!-- <th scope="row">1</th> -->
-        <td>{{acct.id}}</td>
-        <td>{{ acct.account_number }}</td>
-        <td>{{ acct.account_name }} </td>
-        <td>{{ acct.account_type }} </td>
+        <!-- <td>{{acct.id}}</td> -->
+        <td>{{acct[0]}}</td> <!-- <td>{{acct.id}}</td> -->
+        <td>{{acct[1]}}</td> <!-- <td>{{ acct.account_number }}</td> -->
+        <td>{{acct[2]}}</td> <!-- <td>{{ acct.account_name }} </td> -->
+        <td>{{acct[3]}}</td> <!-- <td>{{ acct.account_type }} </td> -->
       </tr>
       {% endfor %}
 

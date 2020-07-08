@@ -12,25 +12,26 @@ from flask import (Blueprint,
 
 
 from ... database.db_connection import (create_connection,
-                                       execute_query,
-                                       execute_read_query,
-                                       )
+                               execute_query,
+                               execute_read_query,
+                               )
 
-accounting_app = Blueprint('accounting_app',
+from ... database.sql_queries.queries_read import read_chart_of_accounts
+
+accounting_app_bp = Blueprint('accounting_app_bp',
                               __name__,
                               template_folder='templates',
                               static_folder='static',
                               static_url_path='accounting_app')
 
 
-@accounting_app.route('/chart_of_accounts')
+@accounting_app_bp.route('/chart_of_accounts')
 def chart_of_accounts():
 
     """Show list of accounts and various detail.
     """
 
     coa = read_chart_of_accounts()
-    print(coa)
 
     return render_template('accounting_app/chart_of_accounts.html',
                            coa=coa,

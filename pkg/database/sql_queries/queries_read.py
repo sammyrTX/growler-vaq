@@ -4,10 +4,10 @@
 SQL read queries
 """
 
-from .. database.db_connection import (create_connection,
-                                       execute_query,
-                                       execute_read_query,
-                                       )
+from .. db_connection import (create_connection,
+                              execute_query,
+                              execute_read_query,
+                              )
 
 
 def read_chart_of_accounts():
