@@ -9,13 +9,13 @@ from .. db_connection import (create_connection,
                               execute_read_query,
                               )
 
+from .. db_config import config
 
-def read_chart_of_accounts():
-    """select all rows from the chart_of_accounts table"""
 
-    webdev_pw = 'MtC^k632coW$c1qK5@Nh#NG$vpNiE*QX2$$6F#lbq9HYGCiVQA'
-    connection = create_connection("localhost", "webdev", webdev_pw, "acctg_system")
+def select_all(table):
+    """select all rows from table"""
+    connection = create_connection(**config)
 
-    select_accts = "SELECT * FROM chart_of_accounts"
+    select_accts = "SELECT * FROM " + table
 
     return execute_read_query(connection, select_accts)

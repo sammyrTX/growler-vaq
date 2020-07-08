@@ -16,7 +16,7 @@ from ... database.db_connection import (create_connection,
                                execute_read_query,
                                )
 
-from ... database.sql_queries.queries_read import read_chart_of_accounts
+from ... database.sql_queries.queries_read import select_all
 
 accounting_app_bp = Blueprint('accounting_app_bp',
                               __name__,
@@ -28,10 +28,10 @@ accounting_app_bp = Blueprint('accounting_app_bp',
 @accounting_app_bp.route('/chart_of_accounts')
 def chart_of_accounts():
 
-    """Show list of accounts and various detail.
+    """Show list of accounts in chart of accounts table.
     """
 
-    coa = read_chart_of_accounts()
+    coa = select_all('chart_of_accounts')
 
     return render_template('accounting_app/chart_of_accounts.html',
                            coa=coa,

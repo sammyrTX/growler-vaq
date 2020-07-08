@@ -5,15 +5,15 @@ import mysql.connector
 from mysql.connector import Error
 
 
-def create_connection(host_name, user_name, user_password, db_name):
+def create_connection(user, password, host, database):
     """Connection to a MySQL database"""
     connection = None
     try:
         connection = mysql.connector.connect(
-            host=host_name,
-            user=user_name,
-            passwd=user_password,
-            database=db_name
+            host=host,
+            user=user,
+            passwd=password,
+            database=database
         )
         print("Connection to MySQL DB successful")
     except Error as e:
@@ -37,6 +37,7 @@ def execute_query(connection, query):
 
 
 def execute_read_query(connection, query):
+    """Execute a select query"""
     cursor = connection.cursor()
     result = None
     try:
@@ -48,7 +49,7 @@ def execute_read_query(connection, query):
 
 
 if __name__ == '__main__':
-    webdev_pw = 'MtC^k632coW$c1qK5@Nh#NG$vpNiE*QX2$$6F#lbq9HYGCiVQA'
+    webdev_pw = '*** use db_config ***'
     connection = create_connection("localhost", "webdev", webdev_pw, "acctg_system")
 
     select_accts = "SELECT * FROM chart_of_accounts"
