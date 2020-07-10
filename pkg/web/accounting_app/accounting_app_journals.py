@@ -1,6 +1,6 @@
-"""Blueprint for accounting app"""
+# accounting_app_journals.py
 
-# put routes and import accounting app functions here.
+"""Routes for Journals"""
 
 from flask import (Blueprint,
                    render_template,
@@ -18,27 +18,87 @@ from ... database.db_connection import (create_connection,
 
 from ... database.sql_queries.queries_read import select_all
 
-accounting_app_bp = Blueprint('accounting_app_bp',
-                              __name__,
-                              template_folder='templates',
-                              static_folder='static',
-                              static_url_path='accounting_app')
+accounting_app_journals_bp = Blueprint('accounting_app_journals_bp',
+                                       __name__,
+                                       template_folder='templates',
+                                       static_folder='static',
+                                       static_url_path='accounting_app')
 
 
-@accounting_app_bp.route('/chart_of_accounts')
-def chart_of_accounts():
+###############################################################################
 
-    """Show list of accounts in chart of accounts table.
+
+@accounting_app_journals_bp.route('/journals/batch_load_file', methods=['GET', 'POST'])
+def batch_load_file():
+
+    """Prompt for a file location of the load file containing journal entries.
+    Select filename for journal entry csv file to be inserted into journals table. Files need to be saved in the je_csv_data folder within the web app root folder.
     """
 
-    coa = select_all('chart_of_accounts')
+    # form = UploadFileForm()
 
-    return render_template('accounting_app/chart_of_accounts.html',
-                           coa=coa,
+    # if form.validate_on_submit():
+
+    #     filename = form.filename.data
+
+    #     load_file = batch_load_je_file(filename)
+
+    #     if load_file == "LOAD OK":
+    #         _batch = JournalBatch.query.filter_by(journal_batch_row_id=batch_row_id).first()
+
+    #         _batch_id = _batch.journal_batch_id
+
+    #         print(f"CHECK _batch_id: {_batch_id} <<<<<<<<<<<<<<<<<")
+
+    #         load_status = batch_load_insert(_batch_id)
+
+    #         if load_status == "INSERT COMPLETE":
+
+    #             return redirect(url_for('journals.review_batch', batch_row_id=batch_row_id))
+    #         else:
+
+    #             return render_template('accounting/load_error.html')
+
+    # _batch = JournalBatch.query.filter_by(journal_batch_row_id=batch_row_id).first()
+
+    # _batch_id = _batch.journal_batch_id
+
+    # _batch_jes = Journal.query.filter_by(journal_batch_id=_batch.journal_batch_id)
+
+    # (batch_id__, total_DR, total_CR) = batch_total(_batch_id)
+
+    _batch = 'Test JE Batch ID'
+
+    _batch_id = '_batch.journal_batch_id'
+
+    _batch_jes = 'aaa'
+
+    (batch_id__, total_DR, total_CR) = (1000, -1000, 0)
+
+    # return render_template('accounting_app/journals/batch_load_file.html',
+    return render_template('journals/batch_load_file.html',
+                           # form=form,
+                           _batch_jes=_batch_jes,
+                           _batch_id=_batch_id,
+                           batch_id__=batch_id__,
+                           total_DR=total_DR,
+                           total_CR=total_CR,
                            )
+#
 
+# @accounting_app_bp.route('/chart_of_accounts')
+# def chart_of_accounts():
 
-# ###############################################################################
+#     """Show list of accounts in chart of accounts table.
+#     """
+
+#     coa = select_all('chart_of_accounts')
+
+#     return render_template('accounting_app/chart_of_accounts.html',
+#                            coa=coa,
+#                            )
+
+###############################################################################
 # ###############################################################################
 # # Code from rhino-tracker to be migrated as required to growler-vaq
 

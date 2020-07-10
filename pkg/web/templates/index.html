@@ -3,13 +3,44 @@
 
 {% block content %}
 
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link active" href="#">Placeholder</a>
+  </li>
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Journals</a>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" href="/accounting_app/journals/batch_load_file">Load Journal batch file</a>
+      <a class="dropdown-item" href="#">Journals 01</a>
+      <a class="dropdown-item" href="#">Journals 02</a>
+      <div class="dropdown-divider"></div>
+      <a class="dropdown-item" href="#">Journals 10</a>
+    </div>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">General Ledger</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">Trial Balance</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">P & L</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">Balance Sheet</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">Cashflow Statement</a>
+  </li>
+  <!-- <li class="nav-item">
+    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+  </li> -->
+</ul>
+
 <div class="jumbotron">
   <p class="lead">Welcome to the accounting system web app that utilizes Python for the back end and Flask for the web framework</p>
   <hr class="my-4">
   <a class="btn btn-primary btn-lg" href="/accounting_app" role="button">Start Accounting System</a>
-
 </div>
-
-
 
 {% endblock %}
