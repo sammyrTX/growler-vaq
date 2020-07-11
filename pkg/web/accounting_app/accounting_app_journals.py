@@ -2,9 +2,6 @@
 
 """Routes for Journals"""
 
-# **** Resume copying forms code to this file *****
-
-
 from flask import (Blueprint,
                    render_template,
                    redirect,
@@ -21,11 +18,11 @@ from ... database.db_connection import (create_connection,
 
 from ... database.sql_queries.queries_read import select_all
 
-from accounting_app.acctg_system.forms import (#JournalEntryForm,
-                                               #JournalUpdateForm,
-                                               BatchEntryForm,
-                                               #UploadFileForm,
-                                               )
+from . forms import (#JournalEntryForm,
+                     #JournalUpdateForm,
+                     BatchEntryForm,
+                     #UploadFileForm,
+                     )
 
 accounting_app_journals_bp = Blueprint('accounting_app_journals_bp',
                                        __name__,
@@ -81,18 +78,28 @@ def create_batch():
     print("############################################################")
 
     if form.validate_on_submit():
+        # Insert new batch data into journal_batch table
 
-        create_batch = JournalBatch(journal_batch_id=form.journal_batch_id.data,
-                                    journal_batch_description=form.journal_batch_description.data,
-                                    journal_batch_entity=form.journal_batch_entity.data,
-                                    journal_batch_currency=form.journal_batch_currency.data,
-                                    gl_post_reference="NEED GL POST REF"
-                                    )
+        # SQLAlchemy model version. Remove after MySQL insert is completed.
+        # create_batch = JournalBatch(journal_batch_id=form.journal_batch_id.data,
+        #                             journal_batch_description=form.journal_batch_description.data,
+        #                             journal_batch_entity=form.journal_batch_entity.data,
+        #                             journal_batch_currency=form.journal_batch_currency.data,
+        #                             gl_post_reference="NEED GL POST REF"
+        #                             )
 
-        db.session.add(create_batch)
-        db.session.commit()
+        # db.session.add(create_batch)
+        # db.session.commit()
+        insert_new_batch_id(form.journal_batch_id.data,
+                        form.journal_batch_description.data,
+                        journal_batch_entity.data,
+                        journal_batch_currency.data,
+                        "NEED GL POST REF",
+                        0,
+                        )
+
         flash("Batch ID Created")
-        return redirect(url_for('journals.batch_list'))  # Need to redirect to
+        return redirect(url_for('journals.batch_list'))
 
     return render_template('accounting/create_batch.html', form=form,
                            entity_list=entity_list,
@@ -171,7 +178,15 @@ def batch_load_file():
 #                            )
 
 ###############################################################################
-# ###############################################################################
+
+
+
+
+
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
 # # Code from rhino-tracker to be migrated as required to growler-vaq
 
 # # acctg_system/views.py
