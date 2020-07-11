@@ -38,7 +38,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'toASMuE59soIk7de34fJ&&'
 
 app.register_blueprint(accounting_app_bp, url_prefix='/accounting_app')
-app.register_blueprint(accounting_app_journals_bp, url_prefix='/accounting_app/journals/')
+app.register_blueprint(accounting_app_journals_bp, url_prefix='/accounting_app')
 
 @app.route('/')
 def index():

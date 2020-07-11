@@ -199,13 +199,13 @@ CODE         STATUS
  3           gl staging data has been inserted into the general_ledger
              table and batch is now considered posted to the gl
 """
-CREATE TABLE jounral_batch (
+CREATE TABLE journal_batch (
 journal_batch_row_id INT PRIMARY KEY,
 journal_batch_id VARCHAR(30) UNIQUE,
 journal_batch_description VARCHAR(30),
 journal_batch_entity INT,
 journal_batch_currency INT,
-gl_post_reference VARCHAR(20),
+gl_post_reference CHAR(26),
 gl_batch_status INT
 );
 

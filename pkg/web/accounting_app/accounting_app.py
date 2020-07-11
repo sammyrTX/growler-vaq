@@ -38,6 +38,27 @@ def chart_of_accounts():
                            )
 
 
+@accounting_app_bp.route('/batch_load_file')
+def batch_load_file():
+
+    _batch = 'Test JE Batch ID'
+
+    _batch_id = '_batch.journal_batch_id'
+
+    _batch_jes = 'aaa'
+
+    (batch_id__, total_DR, total_CR) = (1000, -1000, 0)
+
+    # return render_template('accounting_app/journals/batch_load_file.html',
+    return render_template('accounting_app/batch_load_file.html',
+                           # form=form,
+                           _batch_jes=_batch_jes,
+                           _batch_id=_batch_id,
+                           batch_id__=batch_id__,
+                           total_DR=total_DR,
+                           total_CR=total_CR,
+                           )
+
 # ###############################################################################
 # ###############################################################################
 # # Code from rhino-tracker to be migrated as required to growler-vaq

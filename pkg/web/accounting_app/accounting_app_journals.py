@@ -2,6 +2,9 @@
 
 """Routes for Journals"""
 
+# **** Resume copying forms code to this file *****
+
+
 from flask import (Blueprint,
                    render_template,
                    redirect,
@@ -18,6 +21,12 @@ from ... database.db_connection import (create_connection,
 
 from ... database.sql_queries.queries_read import select_all
 
+from accounting_app.acctg_system.forms import (#JournalEntryForm,
+                                               #JournalUpdateForm,
+                                               BatchEntryForm,
+                                               #UploadFileForm,
+                                               )
+
 accounting_app_journals_bp = Blueprint('accounting_app_journals_bp',
                                        __name__,
                                        template_folder='templates',
@@ -26,6 +35,69 @@ accounting_app_journals_bp = Blueprint('accounting_app_journals_bp',
 
 
 ###############################################################################
+
+@accounting_app_journals_bp.route('/journals/hello_there', methods=['GET', 'POST'])
+def hello_there():
+    return '<h1>Hello There!</h1>'
+
+
+@accounting_app_journals_bp.route('/journals/journals_strobe', methods=['GET', 'POST'])
+def journals_strobe():
+
+    """Endpoint to reference while building the pages and functions related to
+    journal entries.
+    """
+    marker = 'Test Value Alpha'
+
+    return render_template('journals/journals_strobe.html',
+                           marker=marker,
+                           )
+
+
+@accounting_app_journals_bp.route('/journals/create_batch', methods=['GET', 'POST'])
+def create_batch():
+
+    """Route to create a new batch. Need to provide a batch ID (or a name), a
+    brief description, associated entity and currency.
+    """
+
+    form = BatchEntryForm()
+
+    entity_list = select_all('entity')
+    currency_list = select_all('currency')
+
+    # if form.validate_on_submit() is False:
+    #     return render_template('accounting/acctg_message.html', form=form)
+
+    #  TODO  check form data here
+    print("############################################################")
+    print("### form.errors:                      ", form.errors)
+    print("### journal_batch_id.data:            ", form.journal_batch_id.data)
+    print("### form.journal_batch_desc.data:     ", form.journal_batch_description.data)
+    print("### form.journal_batch_entity.data:   ", form.journal_batch_entity.data)
+    print("### form.journal_batch_currency.data: ", form.journal_batch_currency.data)
+    print("### form.gl_post_reference.data: ", form.gl_post_reference.data)
+    print("### validate_on_submit:            ", form.validate_on_submit())
+    print("############################################################")
+
+    if form.validate_on_submit():
+
+        create_batch = JournalBatch(journal_batch_id=form.journal_batch_id.data,
+                                    journal_batch_description=form.journal_batch_description.data,
+                                    journal_batch_entity=form.journal_batch_entity.data,
+                                    journal_batch_currency=form.journal_batch_currency.data,
+                                    gl_post_reference="NEED GL POST REF"
+                                    )
+
+        db.session.add(create_batch)
+        db.session.commit()
+        flash("Batch ID Created")
+        return redirect(url_for('journals.batch_list'))  # Need to redirect to
+
+    return render_template('accounting/create_batch.html', form=form,
+                           entity_list=entity_list,
+                           currency_list=currency_list,
+                           )
 
 
 @accounting_app_journals_bp.route('/journals/batch_load_file', methods=['GET', 'POST'])
