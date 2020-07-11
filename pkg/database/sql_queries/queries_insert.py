@@ -48,6 +48,14 @@ def insert_new_batch_id(journal_batch_id,
                  table and batch is now considered posted to the gl
     """
 
+    print('*' * 50)
+    print(f'{journal_batch_id} >>> type: {type(journal_batch_id)}')
+    print(f'{journal_batch_description} >>> type: {type(journal_batch_description)}')
+    print(f'{journal_batch_entity} >>> type: {type(journal_batch_entity)}')
+    print(f'{journal_batch_currency} >>> type: {type(journal_batch_currency)}')
+    print(f'{gl_post_reference} >>> type: {type(gl_post_reference)}')
+    print(f'{gl_batch_status} >>> type: {type(gl_batch_status)}')
+    print('*' * 50)
     add_new_batch_id = """
 INSERT INTO journal_batch (journal_batch_id, journal_batch_description, journal_batch_entity, journal_batch_currency, gl_post_reference, gl_batch_status)
 

@@ -200,7 +200,7 @@ CODE         STATUS
              table and batch is now considered posted to the gl
 """
 CREATE TABLE journal_batch (
-journal_batch_row_id INT PRIMARY KEY,
+journal_batch_row_id INT AUTO_INCREMENT PRIMARY KEY,
 journal_batch_id VARCHAR(30) UNIQUE,
 journal_batch_description VARCHAR(30),
 journal_batch_entity INT,

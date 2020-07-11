@@ -18,6 +18,8 @@ from ... database.db_connection import (create_connection,
 
 from ... database.sql_queries.queries_read import select_all
 
+from ... database.sql_queries.queries_insert import insert_new_batch_id
+
 from . forms import (#JournalEntryForm,
                      #JournalUpdateForm,
                      BatchEntryForm,
@@ -53,6 +55,12 @@ def journals_strobe():
 
 @accounting_app_journals_bp.route('/journals/create_batch', methods=['GET', 'POST'])
 def create_batch():
+
+    # *****************************************************************
+    # Check Error:
+    # werkzeug.routing.BuildError: Could not build url for endpoint 'journals.batch_list'. Did you mean 'accounting_app_journals_bp.batch_load_file' instead?
+    # *****************************************************************
+
 
     """Route to create a new batch. Need to provide a batch ID (or a name), a
     brief description, associated entity and currency.
@@ -90,18 +98,22 @@ def create_batch():
 
         # db.session.add(create_batch)
         # db.session.commit()
+        print('>' * 30)
+        print(f'type: {type(str(form.journal_batch_entity.data))}')
+        print(f'>>> form.journal_batch_entity.data: {form.journal_batch_entity.data}')
+
         insert_new_batch_id(form.journal_batch_id.data,
-                        form.journal_batch_description.data,
-                        journal_batch_entity.data,
-                        journal_batch_currency.data,
-                        "NEED GL POST REF",
-                        0,
-                        )
+                            form.journal_batch_description.data,
+                            str(form.journal_batch_entity.data),
+                            str(form.journal_batch_currency.data),
+                            "NEED GL POST REF",
+                            "0",
+                            )
 
         flash("Batch ID Created")
         return redirect(url_for('journals.batch_list'))
 
-    return render_template('accounting/create_batch.html', form=form,
+    return render_template('journals/create_batch.html', form=form,
                            entity_list=entity_list,
                            currency_list=currency_list,
                            )
