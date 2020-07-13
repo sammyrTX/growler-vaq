@@ -20,6 +20,7 @@ from wtforms.validators import DataRequired, InputRequired
 
 
 class BatchEntryForm(FlaskForm):
+    """Form to create a new Journal Entry Batch."""
     journal_batch_id = StringField('Batch ID', validators=[DataRequired()])
     journal_batch_description = StringField('Batch Description', validators=[DataRequired()])
     journal_batch_entity = IntegerField('Entity', validators=[InputRequired()])
@@ -27,3 +28,18 @@ class BatchEntryForm(FlaskForm):
     gl_post_reference = StringField('GL_Post_Reference', validators=[DataRequired()])
 
     enter = SubmitField('Create Batch')
+
+
+class JournalEntryForm(FlaskForm):
+    """Form to create a new Journal Entry for a provided batch_id."""
+    journal_name = StringField('Journal Name', validators=[DataRequired()])
+    journal_date = DateField('Journal Date', validators=[DataRequired()])
+    account_number = SelectField('Account Number', choices=acct_, coerce=int, validators=[DataRequired()])
+    department_number = SelectField('Department Number', choices=dept_, coerce=int, validators=[DataRequired()])
+    journal_entry_type = IntegerField('Type', validators=[DataRequired()])
+    journal_debit = FloatField('Debit', validators=[InputRequired()])
+    journal_credit = FloatField('Credit', validators=[InputRequired()])
+    journal_description = StringField('Description', validators=[DataRequired()])
+    journal_reference = StringField('Reference', validators=[DataRequired()])
+    gl_post_reference = StringField('GL_Post_Reference', validators=[DataRequired()])
+    enter = SubmitField('Enter')

@@ -28,7 +28,7 @@
     {% for batch in batch_list %}
 
     <tr>
-      <!-- <th scope="row">1</th> -->
+      <th scope="row">1</th> -->
       <td><a href="{{url_for('journals.je_entry', journal_batch_row_id=batch.journal_batch_row_id)}}" class="list-group-item list-group-item-action">{{batch.journal_batch_id}}</a></td>
       <td><a class="btn btn-primary" href="{{url_for('journals.load_batch', batch_row_id=batch.journal_batch_row_id)}}">LOAD JE FILE</a></td>
       <td><a class="btn btn-primary" href="{{url_for('journals.review_batch', batch_row_id=batch.journal_batch_row_id)}}">REVIEW</a></td>

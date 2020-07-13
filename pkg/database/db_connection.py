@@ -3,6 +3,7 @@
 
 import mysql.connector
 from mysql.connector import Error
+from . db_config import config
 
 
 def create_connection(user, password, host, database):
@@ -49,8 +50,7 @@ def execute_read_query(connection, query):
 
 
 if __name__ == '__main__':
-    webdev_pw = '*** use db_config ***'
-    connection = create_connection("localhost", "webdev", webdev_pw, "acctg_system")
+    connection = create_connection(**config)
 
     select_accts = "SELECT * FROM chart_of_accounts"
     print(f'query string: {select_accts}')
