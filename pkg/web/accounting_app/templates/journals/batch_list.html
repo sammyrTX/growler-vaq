@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="jumbotron">
+
+  <h1>Batches</h1>
+
+  <p>Current pending batches</p>
+
+</div>
+
+<h2>Available Batches</h2>
+
+<p>Click on Batch ID to begin entering Journal Entries</p>
+<p>Click on Review Batch to review and approve for posting</p>
+<br>
+
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">Batch ID</th>
+      <th scope="col"> </th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for batch in batch_list %}
+
+    <tr>
+      <!-- <th scope="row">1</th> -->
+      <td><a href="{{url_for('journals.je_entry', journal_batch_row_id=batch.journal_batch_row_id)}}" class="list-group-item list-group-item-action">{{batch.journal_batch_id}}</a></td>
+      <td><a class="btn btn-primary" href="{{url_for('journals.load_batch', batch_row_id=batch.journal_batch_row_id)}}">LOAD JE FILE</a></td>
+      <td><a class="btn btn-primary" href="{{url_for('journals.review_batch', batch_row_id=batch.journal_batch_row_id)}}">REVIEW</a></td>
+    </tr>
+
+    {% endfor %}
+  </tbody>
+</table>
+
+<br><br>
+
+{% endblock %}

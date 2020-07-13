@@ -111,12 +111,215 @@ def create_batch():
                             )
 
         flash("Batch ID Created")
-        return redirect(url_for('journals.batch_list'))
+        return redirect(url_for('accounting_app_journals_bp.batch_list'))
 
     return render_template('journals/create_batch.html', form=form,
                            entity_list=entity_list,
                            currency_list=currency_list,
                            )
+
+
+@accounting_app_journals_bp.route('/batch_list', methods=['GET', 'POST'])
+# @login_required
+def batch_list():
+
+    """A list of the available batches. This list will exclude batches that
+    have already posted. Select a batch to start adding journal entries or to
+    review for posting to the GL.
+    """
+
+    batch_list = select_all('journal_batch') # ***Need to filter per original
+
+    # batch_list = JournalBatch.query.filter(or_(JournalBatch.gl_batch_status == 0, JournalBatch.gl_batch_status == 1, JournalBatch.gl_batch_status == 2,))
+
+    return render_template('journals/batch_list.html',
+                           batch_list=batch_list,
+                           )
+
+
+@accounting_app_journals_bp.route('/je_entry/<int:journal_batch_row_id>', methods=['GET', 'POST'])
+# @login_required
+def je_entry(journal_batch_row_id):
+
+    """Journal Entry route. After selecting a specific batch, the user is
+    redirected to the Journal Entry page for the selected batch. Entity and
+    currency are hardcoded to the JE. Assumption is that a batch will only
+    be associated with a single entity and single currency.
+    """
+
+    form = JournalEntryForm()
+    dept_list = Departments.query.all()
+    account_list = ChartOfAccounts.query.all()
+
+    batch_ = JournalBatch.query.filter_by(journal_batch_row_id=journal_batch_row_id).first()
+
+    batch_id = batch_.journal_batch_id
+    batch_entity = batch_.journal_batch_entity
+    batch_currency = batch_.journal_batch_currency
+    entity_name = Entity.query.filter_by(entity_id=batch_entity).first()
+    currency__ = Currency.query.filter_by(currency_id=batch_currency).first()
+
+    #  Check form data here
+    print("############################################################")
+    print("### journal_batch_row_id:              ", journal_batch_row_id)
+    print("### batch_id:                      ", batch_id)
+    print("### entity_name:                   ", entity_name.entity_name)
+    print("### currency:                   ", currency__.currency_code)
+    print("### currency description:                   ", currency__.currency_description)
+    print("### batch_entity:                  ", batch_entity)
+    print("### batch_currency:                ", batch_currency)
+    print("### form.errors:                   ", form.errors)
+    print("### journal_name.data:             ", form.journal_name.data)
+    print("### form.journal_date.data:        ", form.journal_date.data)
+    print("### form.account_number.data:          ", form.account_number.data)
+    print("### form.department_number.data:       ", form.department_number.data)
+    print("### form.journal_entry_type.data:  ", form.journal_entry_type.data)
+    print("### form.journal_debit.data:      ", form.journal_debit.data)
+    print("### form.journal_credit.data:      ", form.journal_credit.data)
+    print("### form.journal_description:      ", form.journal_description.data)
+    print("### form.journal_reference.data:   ", form.journal_reference.data)
+    print("### form.gl_post_reference.data:   ", form.gl_post_reference.data)
+    # print("### form.journal_entity.data:   ", form.journal_entity.data)
+    # print("### form.journal_currency.data:   ", form.journal_currency.data)
+    print("### validate_on_submit:            ", form.validate_on_submit())
+    print("############################################################")
+
+    if form.validate_on_submit():
+
+        journal_entry = Journal(journal_name=form.journal_name.data,
+                                journal_date=form.journal_date.data,
+                                account_number=form.account_number.data,
+                                department_number=form.department_number.data,
+                                journal_entry_type=form.journal_entry_type.data,
+                                journal_debit=form.journal_debit.data,
+                                journal_credit=form.journal_credit.data,
+                                journal_description=form.journal_description.data,
+                                journal_reference=form.journal_reference.data,
+                                journal_batch_id=batch_id,  #form.journal_batch_id.data,
+                                gl_post_reference=form.gl_post_reference.data,
+                                journal_entity=batch_entity, #form.journal_entity.data,
+                                journal_currency=batch_currency, #form.journal_currency.data,
+                                )
+
+        db.session.add(journal_entry)
+        db.session.commit()
+        flash("Journal Entry Created")
+        return redirect(url_for('core.index'))
+
+    return render_template('journals/journal_entry.html', form=form, dept_list=dept_list, journal_batch_row_id=journal_batch_row_id, batch_id=batch_id, batch_entity=batch_entity, batch_currency=batch_currency, entity_name=entity_name, currency__=currency__, account_list=account_list,)
+
+
+@journals.route('/load_batch/<int:batch_row_id>', methods=['GET', 'POST'])
+# @login_required
+def load_batch(batch_row_id):
+
+    """Select filename for journal entry csv file to be inserted into journals table. Files need to be saved in the je_csv_data folder within the web app root folder.
+    """
+
+    form = UploadFileForm()
+
+    if form.validate_on_submit():
+
+        filename = form.filename.data
+
+        load_file = batch_load_je_file(filename)
+
+        if load_file == "LOAD OK":
+            _batch = JournalBatch.query.filter_by(journal_batch_row_id=batch_row_id).first()
+
+            _batch_id = _batch.journal_batch_id
+
+            print(f"CHECK _batch_id: {_batch_id} <<<<<<<<<<<<<<<<<")
+
+            load_status = batch_load_insert(_batch_id)
+
+            if load_status == "INSERT COMPLETE":
+
+                return redirect(url_for('journals.review_batch', batch_row_id=batch_row_id))
+            else:
+
+                return render_template('accounting/load_error.html')
+
+    _batch = JournalBatch.query.filter_by(journal_batch_row_id=batch_row_id).first()
+
+    _batch_id = _batch.journal_batch_id
+
+    _batch_jes = Journal.query.filter_by(journal_batch_id=_batch.journal_batch_id)
+
+    (batch_id__, total_DR, total_CR) = batch_total(_batch_id)
+
+    return render_template('accounting/batch_load_file.html',
+                           form=form,
+                           _batch_jes=_batch_jes,
+                           _batch_id=_batch_id,
+                           batch_id__=batch_id__,
+                           total_DR=total_DR,
+                           total_CR=total_CR,
+                           )
+
+
+@journals.route('/review_batch/<int:batch_row_id>', methods=['GET', 'POST'])
+# @login_required
+def review_batch(batch_row_id):
+
+    """Review JE's for a batch and mark ready to post to GL.
+    """
+
+    _batch = JournalBatch.query.filter_by(journal_batch_row_id=batch_row_id).first()
+
+    _batch_id = _batch.journal_batch_id
+
+    _batch_jes = Journal.query.filter_by(journal_batch_id=_batch.journal_batch_id)
+
+    # temp
+    print(f"*** TEMP *** batch_row_id arg : {batch_row_id}")
+
+    for je in _batch_jes:
+        print(f"*** TEMP *** _batch_jes : {je.journal_batch_id}")
+
+    _batch_gl_status = _batch.gl_batch_status
+
+    (batch_id__, total_DR, total_CR) = batch_total(_batch_id)
+    print("flag ***")
+
+    print("flag ORM +++++++++++++++++")
+
+    try:
+        orm_total_dr_qry = db.session.query(func.sum(Journal.journal_debit).label('tot_dr')).filter(Journal.journal_batch_id == _batch_id)
+
+        orm_total_cr_qry = db.session.query(func.sum(Journal.journal_credit).label('tot_cr')).filter(Journal.journal_batch_id == _batch_id)
+
+        print(f'+++ {(orm_total_dr_qry.first()[0] + 100000.0)}')
+
+        orm_total_dr = orm_total_dr_qry.first()[0]
+        orm_total_cr = orm_total_cr_qry.first()[0]
+
+        print(f'### DR: {orm_total_dr}')
+        print(f'### CR: {orm_total_cr}')
+    except TypeError:
+        print(f"ORM Totals > TypeError")
+        orm_total_dr = 999999999.0
+        orm_total_cr = 999999999.0
+
+        if _batch_gl_status == 0:
+            _batch_id = "No journal entries for "+ _batch.journal_batch_id + " data"
+
+        else:
+            _batch_id = "*** ERROR *** REVIEW "+ _batch.journal_batch_id + " data"
+
+    print("flag ORM +++++++++++++++++")
+
+    return render_template('accounting/batch_review.html',
+                           _batch_jes=_batch_jes,
+                           _batch_id=_batch_id,
+                           batch_id__=batch_id__,
+                           total_DR=total_DR,
+                           total_CR=total_CR,
+                           orm_total_dr=orm_total_dr,
+                           orm_total_cr=orm_total_cr,
+                           _batch_gl_status=_batch_gl_status,
+                           )
+
 
 
 @accounting_app_journals_bp.route('/journals/batch_load_file', methods=['GET', 'POST'])
