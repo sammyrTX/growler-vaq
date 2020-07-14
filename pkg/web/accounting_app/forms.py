@@ -15,8 +15,21 @@ from wtforms import (StringField,
                      )
 
 from wtforms.fields.html5 import DateField
-
 from wtforms.validators import DataRequired, InputRequired
+
+from ... database.sql_queries.queries_read import select_all
+# Get available rows from chart of accounts and departments tables to populate
+# a list
+chart_of_accounts_tbl = select_all('chart_of_accounts')
+departments_tbl = select_all('departments')
+
+acct_ = [(x.account_number, (str(x.account_number) + " - " + x.account_name)) for x in chart_of_accounts_tbl]
+
+dept_ = [(x.department_number, x.department_name) for x in departments_tbl]
+
+# comment out above code and use empty lists below when rebuilding database
+# acct_ = []
+# dept_ = []
 
 
 class BatchEntryForm(FlaskForm):

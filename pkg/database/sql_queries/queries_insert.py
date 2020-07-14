@@ -3,7 +3,7 @@
 """SQL insert queries."""
 import mysql.connector
 from mysql.connector import Error
-from . db_config import config
+from .. db_config import config
 
 from .. db_connection import (create_connection,
                               execute_query,
