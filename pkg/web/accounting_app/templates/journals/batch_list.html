@@ -28,10 +28,10 @@
     {% for batch in batch_list %}
 
     <tr>
-      <th scope="row">1</th> -->
-      <td><a href="{{url_for('journals.je_entry', journal_batch_row_id=batch.journal_batch_row_id)}}" class="list-group-item list-group-item-action">{{batch.journal_batch_id}}</a></td>
-      <td><a class="btn btn-primary" href="{{url_for('journals.load_batch', batch_row_id=batch.journal_batch_row_id)}}">LOAD JE FILE</a></td>
-      <td><a class="btn btn-primary" href="{{url_for('journals.review_batch', batch_row_id=batch.journal_batch_row_id)}}">REVIEW</a></td>
+      <!-- <th scope="row">1</th> -->
+      <td><a href="{{url_for('accounting_app_journals_bp.je_entry', journal_batch_row_id=batch[0])}}" class="list-group-item list-group-item-action">{{batch[1]}}</a></td>
+      <td><a class="btn btn-primary" href="{{url_for('accounting_app_journals_bp.load_batch', batch_row_id=batch[0])}}">LOAD JE FILE</a></td>
+      <td><a class="btn btn-primary" href="{{url_for('accounting_app_journals_bp.review_batch', batch_row_id=batch[0])}}">REVIEW</a></td>
     </tr>
 
     {% endfor %}

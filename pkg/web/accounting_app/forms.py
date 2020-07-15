@@ -23,9 +23,9 @@ from ... database.sql_queries.queries_read import select_all
 chart_of_accounts_tbl = select_all('chart_of_accounts')
 departments_tbl = select_all('departments')
 
-acct_ = [(x.account_number, (str(x.account_number) + " - " + x.account_name)) for x in chart_of_accounts_tbl]
+acct_ = [(x[1], (str(x[1]) + " - " + x[2])) for x in chart_of_accounts_tbl]
 
-dept_ = [(x.department_number, x.department_name) for x in departments_tbl]
+dept_ = [(x[1], x[2]) for x in departments_tbl]
 
 # comment out above code and use empty lists below when rebuilding database
 # acct_ = []

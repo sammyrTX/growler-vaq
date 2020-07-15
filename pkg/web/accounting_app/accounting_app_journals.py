@@ -64,6 +64,16 @@ def journals_strobe():
                            )
 
 
+@accounting_app_journals_bp.route('/journals/load_batch', methods=['GET', 'POST'])
+def load_batch():
+    return '<h1>Journals - LOAD BATCH endpoint</h1>'
+
+
+@accounting_app_journals_bp.route('/journals/review_batch', methods=['GET', 'POST'])
+def review_batch():
+    return '<h1>Journals - REVIEW BATCH endpoint</h1>'
+
+
 @accounting_app_journals_bp.route('/journals/create_batch', methods=['GET', 'POST'])
 def create_batch():
 
@@ -110,7 +120,7 @@ def create_batch():
                            )
 
 
-@accounting_app_journals_bp.route('/batch_list', methods=['GET', 'POST'])
+@accounting_app_journals_bp.route('journals/batch_list', methods=['GET', 'POST'])
 # @login_required
 def batch_list():
 
@@ -136,7 +146,7 @@ def batch_list():
                  table and batch is now considered posted to the gl
     """
 
-    batch_list = select_batch_available('journal_batch_table')
+    batch_list = select_batch_available(journal_batch_table)
 
     print(f'{batch_list}')
 
