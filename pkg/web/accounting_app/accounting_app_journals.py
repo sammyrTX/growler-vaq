@@ -22,7 +22,9 @@ from ... database.sql_queries.queries_read import (select_all,
                                                    select_entity_name_by_id,
                                                    )
 
-from ... database.sql_queries.queries_insert import insert_new_batch_id
+from ... database.sql_queries.queries_insert import (insert_new_batch_id,
+                                                     insert_new_je_transaction,
+                                                     )
 
 from . forms import (JournalEntryForm,
                      #JournalUpdateForm,
@@ -190,27 +192,23 @@ def je_entry(journal_batch_row_id):
 
     if form.validate_on_submit():
 
-        # Modify to insert JE data using SQL function.
+        insert_new_je_transaction(form.journal_name.data,
+                                  form.journal_date.data,
+                                  form.account_number.data,
+                                  form.department_number.data,
+                                  form.journal_entry_type.data,
+                                  form.journal_debit.data,
+                                  form.journal_credit.data,
+                                  form.journal_description.data,
+                                  form.journal_reference.data,
+                                  batch_id,
+                                  form.gl_post_reference.data,
+                                  batch_entity,
+                                  batch_currency,
+                                  )
 
-        journal_entry = Journal(journal_name=form.journal_name.data,
-                                journal_date=form.journal_date.data,
-                                account_number=form.account_number.data,
-                                department_number=form.department_number.data,
-                                journal_entry_type=form.journal_entry_type.data,
-                                journal_debit=form.journal_debit.data,
-                                journal_credit=form.journal_credit.data,
-                                journal_description=form.journal_description.data,
-                                journal_reference=form.journal_reference.data,
-                                journal_batch_id=batch_id,  #form.journal_batch_id.data,
-                                gl_post_reference=form.gl_post_reference.data,
-                                journal_entity=batch_entity, #form.journal_entity.data,
-                                journal_currency=batch_currency, #form.journal_currency.data,
-                                )
-
-        db.session.add(journal_entry)
-        db.session.commit()
         flash("Journal Entry Created")
-        return redirect(url_for('core.index'))
+        return redirect(url_for('index'))
 
     return render_template('journals/journal_entry.html', form=form, dept_list=dept_list, journal_batch_row_id=journal_batch_row_id, batch_id=batch_id, batch_entity=batch_entity, batch_currency=batch_currency, entity_name=entity_name, currency__=currency__, account_list=account_list,)
 
