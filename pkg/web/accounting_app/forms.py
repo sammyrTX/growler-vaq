@@ -56,3 +56,9 @@ class JournalEntryForm(FlaskForm):
     journal_reference = StringField('Reference', validators=[DataRequired()])
     gl_post_reference = StringField('GL_Post_Reference', validators=[DataRequired()])
     enter = SubmitField('Enter')
+
+
+class UploadFileForm(FlaskForm):
+    filename = FileField('Choose Journal Entries file to open (must be csv format)', validators=[DataRequired()])
+
+    enter = SubmitField('Load File')

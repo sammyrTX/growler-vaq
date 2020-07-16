@@ -98,6 +98,58 @@ def insert_new_je_transaction(journal_name,
     return execute_query(connection, add_new_je)
 
 
+# ****** >>>> Resume Here <<<<<<<<< **********
+#
+# Refactor function to enable it to use the mariadb infrastructure
+#
+#
+
+def batch_load_je_file(filename):
+
+    """Load csv file provided into staging journal entries table (journals_load) and validate before inserting into journals table
+    """
+
+    # Take passed filename argument and load into working table
+
+    #  Open connection to database and open csv file to load
+    try:
+        sqliteConnection = sqlite3.connect(database_folder + db_name)
+        cursor = sqliteConnection.cursor()
+        print(f"Successfully connected to SQLite ({db_name})")
+
+
+
+        with open(working_data_folder + filename) as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+
+            line_count = 0
+
+            for row in csv_reader:
+                if line_count == 0:
+                    line_count += 1
+                else:
+                    sqlite_insert_query = """INSERT INTO journals_loader(journal_name, journal_date, account_number, department_number, journal_entry_type, journal_debit, journal_credit, journal_description, journal_reference, journal_batch_id, gl_post_reference, journal_entity, journal_currency) VALUES('""" + row[1] + """', '""" + row[2] + """', """ + row[3] + """, """ + row[4] + """, """ + row[5] + """, """ + row[6] + """, """ + row[7] + """, '""" + row[8] + """', '""" + row[9] + """', '""" + row[10] + """', '""" + row[11] + """', """ + row[12] + """, """ + row[13] + """)"""
+
+                    cursor.execute(sqlite_insert_query)
+                    line_count += 1
+
+            sqliteConnection.commit()
+            print(f"rows inserted: {line_count}")
+            cursor.close()
+
+    except sqlite3.Error as error:
+        print("Failed to insert data into SQLite table", error)
+
+    finally:
+        if (sqliteConnection):
+            sqliteConnection.close()
+            print("The SQLite connection is closed")
+        print(f"filename passed: {filename}")
+
+    print(f"Load function end...Filename: {filename}")
+    return "LOAD OK"
+
+
 if __name__ == "__main__":
     connection = create_connection(**config)
 

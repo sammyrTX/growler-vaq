@@ -26,7 +26,7 @@ def select_batch_available(table):
     to the General Ledger (i.e. batch status not equal to 3)."""
     connection = create_connection(**config)
 
-    select_batch = """SELECT * FROM """ + table + """ WHERE gl_batch_status <> 3;"""
+    select_batch = """SELECT * FROM """ + table + """ WHERE gl_batch_status <> 3 ORDER BY journal_batch_row_id DESC;"""
 
     print(f'{select_batch}')
 
