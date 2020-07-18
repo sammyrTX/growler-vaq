@@ -104,7 +104,7 @@ csv file. After validation, data will be inserted into the journals
 table.
 """
 CREATE TABLE journals_loader (
-journal_id INT,
+journal_id INT AUTO_INCREMENT PRIMARY KEY,
 journal_name VARCHAR(50),
 journal_date VARCHAR(20),
 account_number INT,

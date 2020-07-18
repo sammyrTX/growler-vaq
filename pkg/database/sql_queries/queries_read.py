@@ -44,6 +44,17 @@ def select_batch_by_id(table, journal_batch_row_id):
     return execute_read_query(connection, select_batch)
 
 
+def select_batch_id(table, journal_batch_row_id):
+    """Get the batch_id from a journal table. One use is to obtain
+    the batch id for transactions loaded into the journals_loader table."""
+
+    connection = create_connection(**config)
+
+    select_batch_id = """SELECT journal_batch_id FROM """ + table + """ GROUP BY journal_batch_id;"""
+
+    return execute_read_query(connection, select_batch_id)
+
+
 def select_entity_name_by_id(table, journal_batch_entity):
     """Select the corresponding entity name for the given entity id from the
     journal entry batch.

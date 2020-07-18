@@ -1,9 +1,12 @@
 # queries_insert.py
 
 """SQL insert queries."""
+import csv
 import mysql.connector
+
 from mysql.connector import Error
-from .. db_config import config
+
+from .. db_config import config, working_data_folder
 
 from .. db_connection import (create_connection,
                               execute_query,
@@ -113,11 +116,8 @@ def batch_load_je_file(filename):
 
     #  Open connection to database and open csv file to load
     try:
-        sqliteConnection = sqlite3.connect(database_folder + db_name)
-        cursor = sqliteConnection.cursor()
-        print(f"Successfully connected to SQLite ({db_name})")
-
-
+        connection = create_connection(**config)
+        print(f"Successfully connected to ({config['database']})")
 
         with open(working_data_folder + filename) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
@@ -128,23 +128,17 @@ def batch_load_je_file(filename):
                 if line_count == 0:
                     line_count += 1
                 else:
-                    sqlite_insert_query = """INSERT INTO journals_loader(journal_name, journal_date, account_number, department_number, journal_entry_type, journal_debit, journal_credit, journal_description, journal_reference, journal_batch_id, gl_post_reference, journal_entity, journal_currency) VALUES('""" + row[1] + """', '""" + row[2] + """', """ + row[3] + """, """ + row[4] + """, """ + row[5] + """, """ + row[6] + """, """ + row[7] + """, '""" + row[8] + """', '""" + row[9] + """', '""" + row[10] + """', '""" + row[11] + """', """ + row[12] + """, """ + row[13] + """)"""
+                    je_row_insert_query = """INSERT INTO journals_loader(journal_name, journal_date, account_number, department_number, journal_entry_type, journal_debit, journal_credit, journal_description, journal_reference, journal_batch_id, gl_post_reference, journal_entity, journal_currency) VALUES('""" + row[1] + """', '""" + row[2] + """', """ + row[3] + """, """ + row[4] + """, """ + row[5] + """, """ + row[6] + """, """ + row[7] + """, '""" + row[8] + """', '""" + row[9] + """', '""" + row[10] + """', '""" + row[11] + """', """ + row[12] + """, """ + row[13] + """)"""
 
-                    cursor.execute(sqlite_insert_query)
+                    execute_query(connection, je_row_insert_query)
                     line_count += 1
-
-            sqliteConnection.commit()
             print(f"rows inserted: {line_count}")
-            cursor.close()
 
-    except sqlite3.Error as error:
-        print("Failed to insert data into SQLite table", error)
+    except ConnectionError as error:
+        print("Failed to insert data into je table", error)
 
     finally:
-        if (sqliteConnection):
-            sqliteConnection.close()
-            print("The SQLite connection is closed")
-        print(f"filename passed: {filename}")
+        print(f"filename loaded: {filename}")
 
     print(f"Load function end...Filename: {filename}")
     return "LOAD OK"
@@ -153,17 +147,22 @@ def batch_load_je_file(filename):
 if __name__ == "__main__":
     connection = create_connection(**config)
 
-    insert_new_je_transaction('Test JE',
-                              '2020-07-13',
-                              1111,
-                              200,
-                              1,
-                              1000.99,
-                              0.0,
-                              'journal_description',
-                              'journal_reference',
-                              'journal_batch_id',
-                              'gl_post_reference',
-                              1,
-                              1,
-                              )
+    # JE transaction load test
+    # insert_new_je_transaction('Test JE',
+    #                           '2020-07-13',
+    #                           1111,
+    #                           200,
+    #                           1,
+    #                           1000.99,
+    #                           0.0,
+    #                           'journal_description',
+    #                           'journal_reference',
+    #                           'journal_batch_id',
+    #                           'gl_post_reference',
+    #                           1,
+    #                           1,
+    #                           )
+
+    filename = 'je_load_juliet.csv'
+
+    batch_load_je_file(filename)
