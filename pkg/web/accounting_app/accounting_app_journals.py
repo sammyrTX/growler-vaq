@@ -171,7 +171,7 @@ def load_batch(batch_row_id):
                            )
 
 
-@journals.route('/load_error')  # TODO
+@accounting_app_journals_bp.route('/load_error')  # TODO
 def load_error():
 
     """If Journal Entry csv load file errors out, return this route"""
