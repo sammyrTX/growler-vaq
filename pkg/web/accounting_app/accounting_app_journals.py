@@ -23,7 +23,7 @@ from ... database.sql_queries.queries_read import (select_all,
                                                    select_batch_id,
                                                    )
 
-from ... database.sql_queries.queries_insert import (insert_new_batch_id,
+from ... database.sql_queries.queries_insert import (insert_new_batch_name,
                                                      insert_new_je_transaction,
                                                      batch_load_je_file,
                                                      )
@@ -83,7 +83,7 @@ def load_batch(batch_row_id):
 
         filename = form.filename.data
 
-        load_file = batch_load_je_file(filename)
+        load_file = batch_load_je_file(filename, batch_row_id)
 
 
         # **** RESUME HERE *****
@@ -165,13 +165,13 @@ def create_batch():
     if form.validate_on_submit():
         # Insert new batch data into journal_batch table
 
-        insert_new_batch_id(form.journal_batch_name.data,
-                            form.journal_batch_description.data,
-                            str(form.journal_batch_entity.data),
-                            str(form.journal_batch_currency.data),
-                            "NEED GL POST REF",  # default for new batch
-                            "0",  # default for new batch
-                            )
+        insert_new_batch_name(form.journal_batch_name.data,
+                              form.journal_batch_description.data,
+                              str(form.journal_batch_entity.data),
+                              str(form.journal_batch_currency.data),
+                              "NEED GL POST REF",  # default for new batch
+                              "0",  # default for new batch
+                              )
 
         flash("Batch ID Created")
         return redirect(url_for('accounting_app_journals_bp.batch_list'))

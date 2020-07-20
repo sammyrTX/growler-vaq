@@ -14,16 +14,7 @@ from .. db_connection import (create_connection,
                               )
 
 
-def select_all(table):
-    """Select all rows from table."""
-    connection = create_connection(**config)
-
-    select_accts = "SELECT * FROM " + table
-
-    return execute_read_query(connection, select_accts)
-
-
-def insert_new_batch_id(journal_batch_name,
+def insert_new_batch_name(journal_batch_name,
                         journal_batch_description,
                         journal_batch_entity,
                         journal_batch_currency,
@@ -108,7 +99,7 @@ def insert_new_je_transaction(journal_name,
 #
 #
 
-def batch_load_je_file(filename):
+def batch_load_je_file(filename, batch_row_id):
 
     """Load csv file provided into staging journal entries table (journals_load) and validate before inserting into journals table
     """
@@ -129,7 +120,7 @@ def batch_load_je_file(filename):
                 if line_count == 0:
                     line_count += 1
                 else:
-                    je_row_insert_query = """INSERT INTO journals_loader(journal_name, journal_date, account_number, department_number, journal_entry_type, journal_debit, journal_credit, journal_description, journal_reference, journal_batch_id, gl_post_reference, journal_entity, journal_currency) VALUES('""" + row[1] + """', '""" + row[2] + """', """ + row[3] + """, """ + row[4] + """, """ + row[5] + """, """ + row[6] + """, """ + row[7] + """, '""" + row[8] + """', '""" + row[9] + """', '""" + row[10] + """', '""" + row[11] + """', """ + row[12] + """, """ + row[13] + """)"""
+                    je_row_insert_query = """INSERT INTO journal_loader(journal_date, account_number, department_number, journal_entry_type, journal_debit, journal_credit, journal_description, journal_reference, journal_batch_row_id, gl_post_reference, journal_entity, journal_currency) VALUES('""" + row[1] + """', """ + row[2] + """, """ + row[3] + """, """ + row[4] + """, """ + row[5] + """, """ + row[6] + """, '""" + row[7] + """', '""" + row[8] + """', """ + str(batch_row_id) + """, '""" + row[10] + """', """ + row[11] + """, """ + row[12] + """)"""
 
                     execute_query(connection, je_row_insert_query)
                     line_count += 1
@@ -164,6 +155,7 @@ if __name__ == "__main__":
     #                           1,
     #                           )
 
-    filename = 'je_load_juliet.csv'
+    filename = 'je_load_kilo.csv'
+    batch_row_id = 2
 
-    batch_load_je_file(filename)
+    batch_load_je_file(filename, batch_row_id)
