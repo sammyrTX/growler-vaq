@@ -78,13 +78,12 @@ journal_name VARCHAR(50)
 );
 
 """Main table that will store the transactional detail for each journal.
-Journal Name will be the key and is indexed. Foreign keys will be
+journal_row_id will be the key and is indexed. Foreign keys will be
 journal_batch_id and gl_post_reference which correspond to Batches and
 GL posts respectively.
 """
-CREATE TABLE journals (
-journal_id INT AUTO_INCREMENT PRIMARY KEY,
-journal_name VARCHAR(50),
+CREATE TABLE journal (
+journal_row_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 journal_date VARCHAR(20),
 account_number INT,
 department_number INT,
@@ -103,9 +102,8 @@ journal_currency INT
 csv file. After validation, data will be inserted into the journals
 table.
 """
-CREATE TABLE journals_loader (
-journal_id INT AUTO_INCREMENT PRIMARY KEY,
-journal_name VARCHAR(50),
+CREATE TABLE journal_loader (
+journal_loader_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 journal_date VARCHAR(20),
 account_number INT,
 department_number INT,
@@ -114,7 +112,7 @@ journal_debit FLOAT,
 journal_credit FLOAT,
 journal_description VARCHAR(100),
 journal_reference VARCHAR(30),
-journal_batch_id VARCHAR(30),
+journal_batch_row_id INT,
 gl_post_reference VARCHAR(20),
 journal_entity INT,
 journal_currency INT
@@ -200,8 +198,8 @@ CODE         STATUS
              table and batch is now considered posted to the gl
 """
 CREATE TABLE journal_batch (
-journal_batch_row_id INT AUTO_INCREMENT PRIMARY KEY,
-journal_batch_id VARCHAR(30) UNIQUE,
+journal_batch_row_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+journal_batch_name VARCHAR(30) UNIQUE,
 journal_batch_description VARCHAR(30),
 journal_batch_entity INT,
 journal_batch_currency INT,

@@ -23,14 +23,14 @@ def select_all(table):
     return execute_read_query(connection, select_accts)
 
 
-def insert_new_batch_id(journal_batch_id,
+def insert_new_batch_id(journal_batch_name,
                         journal_batch_description,
                         journal_batch_entity,
                         journal_batch_currency,
                         gl_post_reference,
                         gl_batch_status,
                         ):
-    """Insert new batch id into journal batch table.
+    """Insert new batch name into journal batch table.
 
     Batches used to group journal entries. Each batch will be
     associated with a unique entity and currency combination, i.e.,
@@ -48,8 +48,9 @@ def insert_new_batch_id(journal_batch_id,
      3           gl staging data has been inserted into the general_ledger
                  table and batch is now considered posted to the gl
     """
+
     print('*' * 50)
-    print(f'{journal_batch_id} >>> type: {type(journal_batch_id)}')
+    print(f'{journal_batch_name} >>> type: {type(journal_batch_name)}')
     print(f'{journal_batch_description} >>> type: {type(journal_batch_description)}')
     print(f'{journal_batch_entity} >>> type: {type(journal_batch_entity)}')
     print(f'{journal_batch_currency} >>> type: {type(journal_batch_currency)}')
@@ -57,11 +58,11 @@ def insert_new_batch_id(journal_batch_id,
     print(f'{gl_batch_status} >>> type: {type(gl_batch_status)}')
     print('*' * 50)
 
-    add_new_batch_id = """ INSERT INTO journal_batch (journal_batch_id,
+    add_new_batch_id = """ INSERT INTO journal_batch (journal_batch_name,
      journal_batch_description, journal_batch_entity,
      journal_batch_currency, gl_post_reference, gl_batch_status)
 
-    VALUES ('""" + journal_batch_id + """', '""" + journal_batch_description + """', """ + journal_batch_entity + """, """ + journal_batch_currency + """, '""" + gl_post_reference + """', """ + gl_batch_status + """);
+    VALUES ('""" + journal_batch_name + """', '""" + journal_batch_description + """', """ + journal_batch_entity + """, """ + journal_batch_currency + """, '""" + gl_post_reference + """', """ + gl_batch_status + """);
     """
     connection = create_connection(**config)
 

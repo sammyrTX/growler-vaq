@@ -66,10 +66,12 @@ def journals_strobe():
                            )
 
 
-@accounting_app_journals_bp.route('/journals/load_batch/<int:batch_row_id>', methods=['GET', 'POST'])
+@accounting_app_journals_bp.route('/journals/load_batchX/<int:batch_row_id>', methods=['GET', 'POST'])
 def load_batchX():
     return '<h1>Journals - LOAD BATCH endpoint</h1>'
 
+
+@accounting_app_journals_bp.route('/journals/load_batch/<int:batch_row_id>', methods=['GET', 'POST'])
 def load_batch(batch_row_id):
 
     """Select filename for journal entry csv file to be inserted into journals table. Files need to be saved in the je_csv_data folder within the web app root folder.
@@ -92,55 +94,6 @@ def load_batch(batch_row_id):
             _batch = JournalBatch.query.filter_by(journal_batch_row_id=batch_row_id).first()
 
             _batch_id = select_batch_id(table, journal_batch_row_id)
-
-            print(f"CHECK _batch_id: {_batch_id} <<<<<<<<<<<<<<<<<")
-
-            load_status = batch_load_insert(_batch_id)
-
-            if load_status == "INSERT COMPLETE":
-
-                return redirect(url_for('journals.review_batch', batch_row_id=batch_row_id))
-            else:
-
-                return render_template('accounting/load_error.html')
-
-    _batch = JournalBatch.query.filter_by(journal_batch_row_id=batch_row_id).first()
-
-    _batch_id = _batch.journal_batch_id
-
-    _batch_jes = Journal.query.filter_by(journal_batch_id=_batch.journal_batch_id)
-
-    (batch_id__, total_DR, total_CR) = batch_total(_batch_id)
-
-    return render_template('accounting/batch_load_file.html',
-                           form=form,
-                           _batch_jes=_batch_jes,
-                           _batch_id=_batch_id,
-                           batch_id__=batch_id__,
-                           total_DR=total_DR,
-                           total_CR=total_CR,
-                           )
-
-
-@accounting_app_journals_bp.route('/load_batch/<int:batch_row_id>', methods=['GET', 'POST'])
-# @login_required
-def load_batch(batch_row_id):
-
-    """Select filename for journal entry csv file to be inserted into journals table. Files need to be saved in the je_csv_data folder within the web app root folder.
-    """
-
-    form = UploadFileForm()
-
-    if form.validate_on_submit():
-
-        filename = form.filename.data
-
-        load_file = batch_load_je_file(filename)
-
-        if load_file == "LOAD OK":
-            _batch = JournalBatch.query.filter_by(journal_batch_row_id=batch_row_id).first()
-
-            _batch_id = _batch.journal_batch_id
 
             print(f"CHECK _batch_id: {_batch_id} <<<<<<<<<<<<<<<<<")
 
@@ -202,23 +155,22 @@ def create_batch():
     #  TODO  check form data here
     print("############################################################")
     print("### form.errors:                      ", form.errors)
-    print("### journal_batch_id.data:            ", form.journal_batch_id.data)
+    print("### journal_batch_name.data:            ", form.journal_batch_name.data)
     print("### form.journal_batch_desc.data:     ", form.journal_batch_description.data)
     print("### form.journal_batch_entity.data:   ", form.journal_batch_entity.data)
     print("### form.journal_batch_currency.data: ", form.journal_batch_currency.data)
-    print("### form.gl_post_reference.data: ", form.gl_post_reference.data)
     print("### validate_on_submit:            ", form.validate_on_submit())
     print("############################################################")
 
     if form.validate_on_submit():
         # Insert new batch data into journal_batch table
 
-        insert_new_batch_id(form.journal_batch_id.data,
+        insert_new_batch_id(form.journal_batch_name.data,
                             form.journal_batch_description.data,
                             str(form.journal_batch_entity.data),
                             str(form.journal_batch_currency.data),
-                            "NEED GL POST REF",
-                            "0",
+                            "NEED GL POST REF",  # default for new batch
+                            "0",  # default for new batch
                             )
 
         flash("Batch ID Created")

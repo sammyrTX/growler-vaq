@@ -34,11 +34,10 @@ dept_ = [(x[1], x[2]) for x in departments_tbl]
 
 class BatchEntryForm(FlaskForm):
     """Form to create a new Journal Entry Batch."""
-    journal_batch_id = StringField('Batch ID', validators=[DataRequired()])
+    journal_batch_name = StringField('Batch Name', validators=[DataRequired()])
     journal_batch_description = StringField('Batch Description', validators=[DataRequired()])
     journal_batch_entity = IntegerField('Entity', validators=[InputRequired()])
     journal_batch_currency = IntegerField('Currency', validators=[InputRequired()])
-    gl_post_reference = StringField('GL_Post_Reference', validators=[DataRequired()])
 
     enter = SubmitField('Create Batch')
 
