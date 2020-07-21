@@ -92,7 +92,7 @@ journal_debit FLOAT,
 journal_credit FLOAT,
 journal_description VARCHAR(100),
 journal_reference VARCHAR(30),
-journal_batch_id VARCHAR(30),
+journal_batch_row_id INT,
 gl_post_reference VARCHAR(20),
 journal_entity INT,
 journal_currency INT

@@ -26,6 +26,7 @@ from ... database.sql_queries.queries_read import (select_all,
 from ... database.sql_queries.queries_insert import (insert_new_batch_name,
                                                      insert_new_je_transaction,
                                                      batch_load_je_file,
+                                                     batch_load_insert,
                                                      )
 
 from . forms import (JournalEntryForm,
@@ -67,8 +68,8 @@ def journals_strobe():
 
 
 @accounting_app_journals_bp.route('/journals/load_batchX/<int:batch_row_id>', methods=['GET', 'POST'])
-def load_batchX():
-    return '<h1>Journals - LOAD BATCH endpoint</h1>'
+def load_batchX(batch_row_id):
+    return f'<h1>Journals - LOAD BATCH endpoint. batch_row_id: {batch_row_id}</h1>'
 
 
 @accounting_app_journals_bp.route('/journals/load_batch/<int:batch_row_id>', methods=['GET', 'POST'])
@@ -85,19 +86,21 @@ def load_batch(batch_row_id):
 
         load_file = batch_load_je_file(filename, batch_row_id)
 
-
         # **** RESUME HERE *****
         # *****
         # ****** Continue refactor work here ********
 
         if load_file == "LOAD OK":
-            _batch = JournalBatch.query.filter_by(journal_batch_row_id=batch_row_id).first()
 
-            _batch_id = select_batch_id(table, journal_batch_row_id)
+            # delete following commented out code if no longer necessary
+            # _batch = JournalBatch.query.filter_by(journal_batch_row_id=batch_row_id).first()
 
-            print(f"CHECK _batch_id: {_batch_id} <<<<<<<<<<<<<<<<<")
+            # _batch_id = select_batch_id(table, journal_batch_row_id)
 
-            load_status = batch_load_insert(_batch_id)
+            # print(f"CHECK _batch_id: {batch_row_id} <<<<<<<<<<<<<<<<<")
+
+            # Load rows from batch_loader temp table into journal table
+            load_status = batch_load_insert(batch_row_id)
 
             if load_status == "INSERT COMPLETE":
 
@@ -105,6 +108,8 @@ def load_batch(batch_row_id):
             else:
 
                 return render_template('accounting/load_error.html')
+
+    # ************ Resume work here  ************************
 
     _batch = JournalBatch.query.filter_by(journal_batch_row_id=batch_row_id).first()
 

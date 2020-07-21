@@ -13,14 +13,18 @@ from .. db_connection import (create_connection,
                               execute_read_query,
                               )
 
+# Valid status for the General Ledger posting process
+# See insert_new_batch_name for a description.
+valid_status = [0, 1, 2, 3, ]
+
 
 def insert_new_batch_name(journal_batch_name,
-                        journal_batch_description,
-                        journal_batch_entity,
-                        journal_batch_currency,
-                        gl_post_reference,
-                        gl_batch_status,
-                        ):
+                          journal_batch_description,
+                          journal_batch_entity,
+                          journal_batch_currency,
+                          gl_post_reference,
+                          gl_batch_status,
+                          ):
     """Insert new batch name into journal batch table.
 
     Batches used to group journal entries. Each batch will be
@@ -93,12 +97,6 @@ def insert_new_je_transaction(journal_name,
     return execute_query(connection, add_new_je)
 
 
-# ****** >>>> Resume Here <<<<<<<<< **********
-#
-# Refactor function to enable it to use the mariadb infrastructure
-#
-#
-
 def batch_load_je_file(filename, batch_row_id):
 
     """Load csv file provided into staging journal entries table (journals_load) and validate before inserting into journals table
@@ -134,6 +132,64 @@ def batch_load_je_file(filename, batch_row_id):
 
     print(f"Load function end...Filename: {filename}")
     return "LOAD OK"
+
+
+def update_batch_gl_status(batch_row_id, status):
+
+    """In the journal_batch table, update the gl status of the batch row id to the passed status argument.
+    """
+
+    # Set the status argument to 99 if the argument is not valid
+    if status not in valid_status:
+        status = 99
+
+    try:
+
+        update_gl_status = """UPDATE journal_batch SET gl_batch_status = """ + str(status) + """  WHERE journal_batch_row_id = """ + str(batch_row_id)
+
+        execute_query(connection, update_gl_status)
+
+        batch_status = "OK"
+        print(f"*** journal batch gl status updated successfully ***")
+
+        return (batch_status)
+
+    except IndexError:
+        print("IndexError!")
+        return "INDEX ERROR"
+
+
+def batch_load_insert(batch_row_id):
+
+    """load rows for a batch_row_id from journals_loader and insert into journals
+    """
+
+    try:
+
+        insert_loader_to_journal = """INSERT INTO journal(journal_date, account_number, department_number, journal_entry_type, journal_debit, journal_credit, journal_description, journal_reference, journal_batch_row_id, gl_post_reference, journal_entity, journal_currency) SELECT journal_date, account_number, department_number, journal_entry_type, journal_debit, journal_credit, journal_description, journal_reference, journal_batch_row_id, gl_post_reference, journal_entity, journal_currency FROM journal_loader"""
+
+        execute_query(connection, insert_loader_to_journal)
+
+        #  After loading journal table, delete rows from the loader table
+        clear_journal_loader = """DELETE FROM journal_loader WHERE batch_row_id = """ + str(batch_row_id)
+
+        execute_query(connection, clear_journal_loader)
+
+        # Update batch status to "1"
+        loader_to_journal_status = update_batch_gl_status(batch_row_id, 1)
+
+        if loader_to_journal_status == 'OK':
+
+            load_status = "INSERT COMPLETE"
+            print(f"*** INSERT COMPLETE ***")
+        else:
+            load_status = 'ERROR with Loader to Journals table'
+
+        return load_status
+
+    except IndexError:
+        print("IndexError!")
+        return "INDEX ERROR"
 
 
 if __name__ == "__main__":
