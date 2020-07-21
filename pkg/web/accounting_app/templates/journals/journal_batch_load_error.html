@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="jumbotron">
+  <h1>JE CSV LOAD ERROR</h1>
+
+  <h2>Please check the csv file and try loading again</h2>
+  <a class="btn btn-primary" href="{{url_for('accounting_app_journals_bp.batch_list')}}">Batch List</a>
+
+</div>
+
+
+{% endblock %}

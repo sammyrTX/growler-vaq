@@ -18,9 +18,8 @@ from ... database.db_connection import (create_connection,
 
 from ... database.sql_queries.queries_read import (select_all,
                                                    select_batch_available,
-                                                   select_batch_by_id,
                                                    select_entity_name_by_id,
-                                                   select_batch_id,
+                                                   select_batch_by_row_id,
                                                    )
 
 from ... database.sql_queries.queries_insert import (insert_new_batch_name,
@@ -86,21 +85,10 @@ def load_batch(batch_row_id):
 
         load_file = batch_load_je_file(filename, batch_row_id)
 
-        # **** RESUME HERE *****
-        # *****
-        # ****** Continue refactor work here ********
-
         if load_file == "LOAD OK":
 
-            # delete following commented out code if no longer necessary
-            # _batch = JournalBatch.query.filter_by(journal_batch_row_id=batch_row_id).first()
-
-            # _batch_id = select_batch_id(table, journal_batch_row_id)
-
-            # print(f"CHECK _batch_id: {batch_row_id} <<<<<<<<<<<<<<<<<")
-
-            # Load rows from batch_loader temp table into journal table
-            load_status = batch_load_insert(batch_row_id)
+            # ********************* RESUME HERE *******************
+            load_status = batch_load_insert(batch_row_id)   # <<<<<< RESUME HERE... See error: execute_query(connection, insert_loader_to_journal) NameError: name 'connection' is not defined
 
             if load_status == "INSERT COMPLETE":
 
@@ -109,33 +97,27 @@ def load_batch(batch_row_id):
 
                 return render_template('accounting/load_error.html')
 
-    # ************ Resume work here  ************************
+    print('*' * 60)
+    print(f'journal_batch_table: {journal_batch_table}  batch_row_id: {batch_row_id}')
+    print('*' * 60)
+    journal_batch_row = select_batch_by_row_id(journal_batch_table, batch_row_id)
+    journal_batch_name = journal_batch_row[0][1]
+    print(f'**** batch name: {journal_batch_name} ****')
 
-    _batch = JournalBatch.query.filter_by(journal_batch_row_id=batch_row_id).first()
-
-    _batch_id = _batch.journal_batch_id
-
-    _batch_jes = Journal.query.filter_by(journal_batch_id=_batch.journal_batch_id)
-
-    (batch_id__, total_DR, total_CR) = batch_total(_batch_id)
-
-    return render_template('accounting/batch_load_file.html',
+    return render_template('/journals/batch_load_file.html',
                            form=form,
-                           _batch_jes=_batch_jes,
-                           _batch_id=_batch_id,
-                           batch_id__=batch_id__,
-                           total_DR=total_DR,
-                           total_CR=total_CR,
+                           journal_batch_name=journal_batch_name,
+                           test_test='TEST'
                            )
 
 
-@accounting_app_journals_bp.route('/load_error')  # TODO
-def load_error():
+@accounting_app_journals_bp.route('/journals/journal_batch_load_error')
+def journal_batch_load_error():
 
     """If Journal Entry csv load file errors out, return this route"""
 
-    # return render_template('accounting/load_error.html')
-    return '<h1>Journals - LOAD ERROR endpoint</h1>'
+    return render_template('journals/journal_batch_load_error.html')
+    # return '<h1>Journals - LOAD ERROR endpoint</h1>'
 
 @accounting_app_journals_bp.route('/journals/review_batch', methods=['GET', 'POST'])
 def review_batch():
