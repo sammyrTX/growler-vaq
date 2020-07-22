@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="jumbotron">
+
+  <h1>Batch Review</h1>
+
+  {% if _batch_gl_status == 0 %}
+
+  <h3><b>{{ _batch_id }}</b></h3>
+
+  {% else %}
+  
+  <h3><b>{{ _batch_id }}</b></h3>
+
+  <p>Review journal entries and approve for posting</p>
+  <p>Click on individual journal entry to edit</p>
+</div>
+
+<!-- ################################################################################
+
+# Evaluate Debits vs Credits and indicate batch status for GL posting -->
+
+<h3>Batch Status</h3>
+
+{% if total_DR == total_CR %}
+
+<form method="POST">
+
+
+  <button class="btn btn-success"> <a class="btn btn-success" href="{{url_for('journals.general_ledger', batch_id=_batch_id)}}">Batch Ready - Post to GL </a></button>
+  <!-- <p class="font-weight-bold font-italic">Ready to Post &nbsp &nbsp<button type="button" href="#" class="btn btn-success">Batch Ready - Post to GL</button></p> -->
+
+</form>
+{% else %}
+
+<button type="button" class="btn btn-warning font-weight-bold font-italic">Debits and Credits do not tie. Please review Journal Entries</button>
+
+{% endif %}
+
+<!-- ################################################################################-->
+<br><br>
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">Debits</th>
+      <th scope="col">Credits</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <!-- <th scope="row">1</th> -->
+      <td>{{ "{:,.2f}".format(total_DR|float) }}</td>
+      <td>{{ "{:,.2f}".format(total_CR|float) }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<h2>TEST {{ _batch_jes_length }}</h2>
+<h3>Journal Entries</h3>
+
+<!-- <div class="list-group">
+
+  <ol>
+
+    {% for je in _batch_jes %}
+
+    <a href="{{url_for('journals.je_update', batch_id=_batch_id, journal_id=je.journal_id)}}" class="list-group-item list-group-item-action">
+      <li> {{je.journal_description}}</li>
+    </a>
+
+    {% endfor %}
+
+    <a href="#" class="list-group-item list-group-item-action disabled" tabindex="-1" aria-disabled="true">Vestibulum at eros</a>
+
+  </ol>
+
+</div> -->
+
+<div>
+
+  <table class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Date</th>
+        <th scope="col">Description</th>
+        <th class="text-right" scope="col">Debit</th>
+        <th class="text-right" scope="col">Credit</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      {% for je in _batch_jes %}
+      <tr>
+
+        <!-- <th scope="row">
+
+        </th> -->
+
+        <td><a href="{{url_for('journals.je_update', batch_id=_batch_id, journal_id=je.journal_id)}}">
+          {{ loop.index }}
+        </a></td>
+
+        <td><a href="{{url_for('journals.je_update', batch_id=_batch_id, journal_id=je.journal_id)}}">
+            {{ je.journal_date }}
+          </a> </td>
+
+        <td><a href="{{url_for('journals.je_update', batch_id=_batch_id, journal_id=je.journal_id)}}">
+            {{ je.journal_description }}
+          </a> </td>
+        <td class="text-right"><a href="{{url_for('journals.je_update', batch_id=_batch_id, journal_id=je.journal_id)}}">
+            {{ "{:,.2f}".format(je.journal_debit|float)}}
+          </a> </td>
+        <td class="text-right"><a href="{{url_for('journals.je_update', batch_id=_batch_id, journal_id=je.journal_id)}}">
+            {{ "{:,.2f}".format(je.journal_credit|float)}}
+          </a> </td>
+
+      </tr>
+      {% endfor %}
+
+      <tr>
+        <td> </td>
+        <td> </td>
+        <td class="float-left"><b>Total</b></td>
+        <td class="text-right"><b>{{"{:,.2f}".format(total_DR|float)}}</b></td>
+        <td class="text-right"><b>{{ "{:,.2f}".format(total_CR|float) }}</b></td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+
+<br>
+
+{% endif %}
+
+<!-- # how to format float to a number with $ and comma (omit $ if desired,
+     # or add USD or GBP)
+{{ "${:,.2f}".format(543921.9354) }} -->
+
+
+
+<!--
+/* ORM Total DR/CR Rendering. Remove if not needed for final version of this */
+/* page.
+<h3>Check ORM total for DR for JE: {{ "{:,.2f}".format(orm_total_dr) }}</h3>
+<h3>Check ORM total for CR for JE: {{ "{:,.2f}".format(orm_total_cr) }}</h3>
+<br><br>
+ -->
+
+{% endblock %}
