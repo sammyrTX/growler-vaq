@@ -20,6 +20,7 @@ from ... database.sql_queries.queries_read import (select_all,
                                                    select_batch_available,
                                                    select_entity_name_by_id,
                                                    select_batch_by_row_id,
+                                                   batch_total,
                                                    )
 
 from ... database.sql_queries.queries_insert import (insert_new_batch_name,
@@ -37,6 +38,7 @@ from . forms import (JournalEntryForm,
 # Table names set up
 
 journal_batch_table = 'journal_batch'   # JE batch table
+journal_table = 'journal'
 entity_table = 'entity'   # Entity table
 
 accounting_app_journals_bp = Blueprint('accounting_app_journals_bp',
@@ -88,14 +90,14 @@ def load_batch(batch_row_id):
         if load_file == "LOAD OK":
 
             # ********************* RESUME HERE *******************
-            load_status = batch_load_insert(batch_row_id)   # <<<<<< RESUME HERE... See error: execute_query(connection, insert_loader_to_journal) NameError: name 'connection' is not defined
+            load_status = batch_load_insert(batch_row_id)
 
             if load_status == "INSERT COMPLETE":
 
-                return redirect(url_for('journals.review_batch', batch_row_id=batch_row_id))
+                return redirect(url_for('accounting_app_journals_bp.review_batch', batch_row_id=batch_row_id))
             else:
 
-                return render_template('accounting/load_error.html')
+                return render_template('accounting_app_journals_bp/load_error.html')
 
     print('*' * 60)
     print(f'journal_batch_table: {journal_batch_table}  batch_row_id: {batch_row_id}')
@@ -119,10 +121,103 @@ def journal_batch_load_error():
     return render_template('journals/journal_batch_load_error.html')
     # return '<h1>Journals - LOAD ERROR endpoint</h1>'
 
-@accounting_app_journals_bp.route('/journals/review_batch', methods=['GET', 'POST'])
-def review_batch():
-    return '<h1>Journals - REVIEW BATCH endpoint</h1>'
 
+@accounting_app_journals_bp.route('/journals/review_batch/<int:batch_row_id>', methods=['GET', 'POST'])
+def review_batch(batch_row_id):
+    """Review JE's for a batch and mark ready to post to GL.
+    """
+
+    # Get row for corresponding batch_row_id
+    journal_batch_row = select_batch_by_row_id(journal_batch_table, batch_row_id)
+
+    # Get batch_name  for corresponding batch_row_id
+    batch_name = journal_batch_row[0][1]
+
+    # Get rows for corresponding batch_row_id in journal table
+    batch_jes = select_batch_by_row_id(journal_table, batch_row_id)
+
+    # Get gl status for corresponding batch_row_id
+    journal_batch_gl_status = journal_batch_row[0][6]
+
+    (batch_row_id, total_DR, total_CR) = batch_total(batch_row_id)
+
+    return render_template('journals/batch_review.html',
+                           _batch_jes=batch_jes,
+                           _batch_id=batch_name,
+                           batch_id__=batch_name,
+                           total_DR=total_DR,
+                           total_CR=total_CR,
+                           orm_total_dr=total_DR,
+                           orm_total_cr=total_CR,
+                           _batch_gl_status=journal_batch_gl_status,
+                           )
+    # return '<h1>Journals - REVIEW BATCH endpoint</h1>'
+
+# ###############################################################################
+
+# @journals.route('/review_batch/<int:batch_row_id>', methods=['GET', 'POST'])
+# # @login_required
+# def review_batchOLD(batch_row_id):
+
+#     """Review JE's for a batch and mark ready to post to GL.
+#     """
+
+#     _batch = JournalBatch.query.filter_by(journal_batch_row_id=batch_row_id).first()
+
+#     _batch_id = _batch.journal_batch_id
+
+#     _batch_jes = Journal.query.filter_by(journal_batch_id=_batch.journal_batch_id)
+
+#     # temp
+#     print(f"*** TEMP *** batch_row_id arg : {batch_row_id}")
+
+#     for je in _batch_jes:
+#         print(f"*** TEMP *** _batch_jes : {je.journal_batch_id}")
+
+#     _batch_gl_status = _batch.gl_batch_status
+
+#     (batch_id__, total_DR, total_CR) = batch_total(_batch_id)
+#     print("flag ***")
+
+#     print("flag ORM +++++++++++++++++")
+
+#     try:
+#         orm_total_dr_qry = db.session.query(func.sum(Journal.journal_debit).label('tot_dr')).filter(Journal.journal_batch_id == _batch_id)
+
+#         orm_total_cr_qry = db.session.query(func.sum(Journal.journal_credit).label('tot_cr')).filter(Journal.journal_batch_id == _batch_id)
+
+#         print(f'+++ {(orm_total_dr_qry.first()[0] + 100000.0)}')
+
+#         orm_total_dr = orm_total_dr_qry.first()[0]
+#         orm_total_cr = orm_total_cr_qry.first()[0]
+
+#         print(f'### DR: {orm_total_dr}')
+#         print(f'### CR: {orm_total_cr}')
+#     except TypeError:
+#         print(f"ORM Totals > TypeError")
+#         orm_total_dr = 999999999.0
+#         orm_total_cr = 999999999.0
+
+#         if _batch_gl_status == 0:
+#             _batch_id = "No journal entries for "+ _batch.journal_batch_id + " data"
+
+#         else:
+#             _batch_id = "*** ERROR *** REVIEW "+ _batch.journal_batch_id + " data"
+
+#     print("flag ORM +++++++++++++++++")
+
+#     return render_template('accounting/batch_review.html',
+#                            _batch_jes=_batch_jes,
+#                            _batch_id=_batch_id,
+#                            batch_id__=batch_id__,
+#                            total_DR=total_DR,
+#                            total_CR=total_CR,
+#                            orm_total_dr=orm_total_dr,
+#                            orm_total_cr=orm_total_cr,
+#                            _batch_gl_status=_batch_gl_status,
+#                            )
+
+###############################################################################
 
 @accounting_app_journals_bp.route('/journals/create_batch', methods=['GET', 'POST'])
 def create_batch():

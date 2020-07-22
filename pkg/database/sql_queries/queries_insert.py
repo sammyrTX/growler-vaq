@@ -144,7 +144,7 @@ def update_batch_gl_status(batch_row_id, status):
         status = 99
 
     try:
-
+        connection = create_connection(**config)
         update_gl_status = """UPDATE journal_batch SET gl_batch_status = """ + str(status) + """  WHERE journal_batch_row_id = """ + str(batch_row_id)
 
         execute_query(connection, update_gl_status)
@@ -165,7 +165,7 @@ def batch_load_insert(batch_row_id):
     """
 
     try:
-
+        connection = create_connection(**config)
         insert_loader_to_journal = """INSERT INTO journal(journal_date, account_number, department_number, journal_entry_type, journal_debit, journal_credit, journal_description, journal_reference, journal_batch_row_id, gl_post_reference, journal_entity, journal_currency) SELECT journal_date, account_number, department_number, journal_entry_type, journal_debit, journal_credit, journal_description, journal_reference, journal_batch_row_id, gl_post_reference, journal_entity, journal_currency FROM journal_loader"""
 
         execute_query(connection, insert_loader_to_journal)

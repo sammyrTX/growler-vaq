@@ -61,20 +61,16 @@ def select_batch_id(table, journal_batch_row_id):
     return execute_read_query(connection, select_batch_id)
 
 
-def batch_total(batch_id):
+def batch_total(batch_row_id):
 
     """For a given batch, total the debits and credits
     """
 
-    # try:
-    sqliteConnection = sqlite3.connect('./accounting_app/' + db_name)
-    cursor = sqliteConnection.cursor()
-    print(f"Successfully connected to SQLite ({db_name})")
+    connection = create_connection(**config)
 
-    dr_cr_totals_query = """SELECT journal_batch_id, sum(journal_debit), sum(journal_credit) FROM journals WHERE journal_batch_id = '""" + batch_id + """' GROUP BY journal_batch_id"""
+    dr_cr_totals_query = """SELECT journal_batch_row_id, sum(journal_debit), sum(journal_credit) FROM journal WHERE journal_batch_row_id = '""" + str(batch_row_id) + """' GROUP BY journal_batch_row_id"""
 
-    dr_cr_totals = cursor.execute(dr_cr_totals_query)
-
+    dr_cr_totals = execute_read_query(connection, dr_cr_totals_query)
     dr_cr_totals_list = list(dr_cr_totals)
 
     if dr_cr_totals is None:
@@ -84,9 +80,9 @@ def batch_total(batch_id):
         return ("ERROR", 999999, 888888)
 
     try:
-        print(f"FUNC: batch_total - journal_batch_id >>> {dr_cr_totals_list[0][0]}")
-        print(f"FUNC: batch_total  - cr total >>> {dr_cr_totals_list[0][1]}")
-        print(f"FUNC: batch_total - dr total >>> {dr_cr_totals_list[0][2]}")
+        print(f"FUNC: batch_total - journal_batch_row_id >>> {dr_cr_totals_list[0][0]}")
+        print(f"FUNC: batch_total  - dr total >>> {dr_cr_totals_list[0][1]}")
+        print(f"FUNC: batch_total - cr total >>> {dr_cr_totals_list[0][2]}")
 
         return (dr_cr_totals_list[0][0],
                 dr_cr_totals_list[0][1],
