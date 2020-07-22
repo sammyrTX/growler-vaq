@@ -61,3 +61,22 @@ class UploadFileForm(FlaskForm):
     filename = FileField('Choose Journal Entries file to open (must be csv format)', validators=[DataRequired()])
 
     enter = SubmitField('Load File')
+
+
+class JournalUpdateForm(FlaskForm):
+
+    journal_date = StringField('Journal Date (YYYY-MM-DD)', validators=[DataRequired()])
+    account_number = SelectField('Account Number', choices=acct_, coerce=int, validators=[DataRequired()])
+    department_number = SelectField('Department Number', choices=dept_, coerce=int, validators=[DataRequired()])
+    journal_entry_type = IntegerField('Type', validators=[DataRequired()])
+    journal_debit = FloatField('Debit', validators=[InputRequired()])
+    journal_credit = FloatField('Credit', validators=[InputRequired()])
+    journal_description = StringField('Description', validators=[DataRequired()])
+    journal_reference = StringField('Reference', validators=[DataRequired()])
+    journal_batch_row_id = IntegerField('JE_Batch_Row_ID', validators=[DataRequired()])
+    gl_post_reference = StringField('GL_Post_Reference', validators=[DataRequired()])
+
+    journal_entity = IntegerField('JE_entity', validators=[InputRequired()])
+    journal_currency = IntegerField('JE_currency', validators=[DataRequired()])
+
+    enter = SubmitField('Update')

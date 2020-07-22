@@ -33,7 +33,7 @@
       <!-- <th scope="row">1</th> -->
       <td><a href="{{url_for('accounting_app_journals_bp.je_entry', journal_batch_row_id=batch[0])}}" class="list-group-item list-group-item-action">{{batch[1]}}</a></td>
       <td><a class="btn btn-primary" href="{{url_for('accounting_app_journals_bp.load_batch', batch_row_id=batch[0])}}">LOAD JE FILE (TEMP ENDPOINT)</a></td>
-      <td><a class="btn btn-primary" href="{{url_for('accounting_app_journals_bp.review_batch', batch_row_id=batch[0])}}">REVIEW</a></td>
+      <td><a class="btn btn-primary" href="{{url_for('accounting_app_journals_bp.batch_review', batch_row_id=batch[0])}}">REVIEW</a></td>
     </tr>
 
     {% endfor %}

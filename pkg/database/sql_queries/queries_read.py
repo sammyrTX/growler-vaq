@@ -34,7 +34,7 @@ def select_batch_available(table):
 
 
 def select_batch_by_row_id(table, journal_batch_row_id):
-    """Select a row from journal_batch for a specific batch joining
+    """Select row(s) from a table for a specific batch joining
     on journal_batch_row_id."""
 
     connection = create_connection(**config)
@@ -43,11 +43,18 @@ def select_batch_by_row_id(table, journal_batch_row_id):
 
     select_batch = """SELECT * FROM """ + table + """ WHERE journal_batch_row_id = """ + str(journal_batch_row_id) + """;"""
 
-    print(f'>>>>>>>  select_batch = {select_batch}')
-    xxx = execute_read_query(connection, select_batch)
-    print(f'++++++++++++++++++++ result: {xxx}')
-    print('>>>>>>>>>>', list(execute_read_query(connection, select_batch)))
     return execute_read_query(connection, select_batch)
+
+
+def select_je_by_row_id(table, journal_row_id):
+    """Select row(s) from a table for a specific je joining
+    on journal_row_id."""
+
+    connection = create_connection(**config)
+
+    select_je = """SELECT * FROM """ + table + """ WHERE journal_row_id = """ + str(journal_row_id) + """;"""
+
+    return execute_read_query(connection, select_je)
 
 
 def select_batch_id(table, journal_batch_row_id):
