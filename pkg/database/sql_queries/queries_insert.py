@@ -99,7 +99,7 @@ def insert_new_je_transaction(journal_name,
 
 def batch_load_je_file(filename, batch_row_id):
 
-    """Load csv file provided into staging journal entries table (journals_load) and validate before inserting into journals table
+    """Load csv file provided into staging journal entries table (journal_loader) and validate before inserting into journals table
     """
 
     # Take passed filename argument and load into working table
@@ -128,7 +128,7 @@ def batch_load_je_file(filename, batch_row_id):
         print("Failed to insert data into je table", error)
 
     finally:
-        print(f"filename loaded: {filename}")
+        print(f"filename loaded to journal_loader: {filename}")
 
     print(f"Load function end...Filename: {filename}")
     return "LOAD OK"
@@ -180,7 +180,7 @@ def batch_load_insert(batch_row_id):
 
         if loader_to_journal_status == 'OK':
 
-            load_status = "INSERT COMPLETE"
+            load_status = "journal_load to journal INSERT COMPLETE"
             print(f"*** INSERT COMPLETE ***")
         else:
             load_status = 'ERROR with Loader to Journals table'

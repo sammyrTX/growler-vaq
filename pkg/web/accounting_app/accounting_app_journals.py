@@ -83,35 +83,50 @@ def load_batch(batch_row_id):
     form = UploadFileForm()
 
     if form.validate_on_submit():
-
         filename = form.filename.data
 
+        # load CSV data into staging table (journal_loader)
         load_file = batch_load_je_file(filename, batch_row_id)
 
         if load_file == "LOAD OK":
+            return redirect(url_for('accounting_app_journals_bp.journal_loader_batch_review', batch_row_id=batch_row_id))
+        else:
+            return render_template('accounting_app_journals_bp/load_error.html')
 
-            # ********************* RESUME HERE *******************
-            load_status = batch_load_insert(batch_row_id)
+    (batch_row_id,
+     batch_name,
+     batch_description,
+     batch_entity,
+     batch_currency,
+     gl_post_reference,
+     gl_batch_status,
+     ) = select_batch_by_row_id(journal_batch_table, batch_row_id)
+    # journal_batch_row = select_batch_by_row_id(journal_batch_table, batch_row_id)
+    # journal_batch_name = journal_batch_row[0][1]
 
-            if load_status == "INSERT COMPLETE":
-
-                return redirect(url_for('accounting_app_journals_bp.batch_review', batch_row_id=batch_row_id))
-            else:
-
-                return render_template('accounting_app_journals_bp/load_error.html')
-
-    print('*' * 60)
-    print(f'journal_batch_table: {journal_batch_table}  batch_row_id: {batch_row_id}')
-    print('*' * 60)
-    journal_batch_row = select_batch_by_row_id(journal_batch_table, batch_row_id)
-    journal_batch_name = journal_batch_row[0][1]
-    print(f'**** batch name: {journal_batch_name} ****')
+    print(f'**** batch name: {batch_name} ****')
 
     return render_template('/journals/batch_load_file.html',
                            form=form,
-                           journal_batch_name=journal_batch_name,
+                           batch_name=batch_name,
                            test_test='TEST'
                            )
+
+
+@accounting_app_journals_bp.route('/journals/placeholder')
+def journal_loader_to_journal_placeholder():
+
+    """Placeholder to move batch data from journal loader to journal after"""
+
+    # load_status = batch_load_insert(batch_row_id)
+
+    # if load_status == "INSERT COMPLETE":
+
+    #     return redirect(url_for('accounting_app_journals_bp.batch_review', batch_row_id=batch_row_id))
+    # else:
+
+    #     return render_template('accounting_app_journals_bp/load_error.html')
+    return '<h1>Journals - journal_loader to journal endpoint</h1>'
 
 
 @accounting_app_journals_bp.route('/journals/journal_batch_load_error')
@@ -123,9 +138,10 @@ def journal_batch_load_error():
     # return '<h1>Journals - LOAD ERROR endpoint</h1>'
 
 
-@accounting_app_journals_bp.route('/journals/batch_review/<int:batch_row_id>', methods=['GET', 'POST'])
-def batch_review(batch_row_id):
-    """Review JE's for a batch and mark ready to post to GL.
+@accounting_app_journals_bp.route('/journals/journal_loader_batch_review/<int:batch_row_id>', methods=['GET', 'POST'])
+def journal_loader_batch_review(batch_row_id):
+
+    """Review JE's loaded into staging table (journal_load) and mark ready to load into journal table.
     """
 
     # Get row for corresponding batch_row_id
@@ -154,6 +170,42 @@ def batch_review(batch_row_id):
                            total_CR=total_CR,
                            batch_gl_status=journal_batch_gl_status,
                            )
+
+
+# Use code from this section to post batch to GL when ready
+
+# @accounting_app_journals_bp.route('/journals/journal_loader_batch_review/<int:batch_row_id>', methods=['GET', 'POST'])
+# def journal_loader_batch_review(batch_row_id):
+
+#     """Review JE's for a batch and mark ready to post to GL.
+#     """
+
+#     # Get row for corresponding batch_row_id
+#     journal_batch_row = select_batch_by_row_id(journal_batch_table, batch_row_id)
+
+#     # Get batch_name  for corresponding batch_row_id
+#     batch_name = journal_batch_row[0][1]
+
+#     # Get rows for corresponding batch_row_id in journal table
+#     batch_jes = select_batch_by_row_id(journal_table, batch_row_id)
+
+#     print('+' * 50)
+#     for _ in batch_jes:
+#       print(f'{_}')
+#     print('+' * 50)
+#     # Get gl status for corresponding batch_row_id
+#     journal_batch_gl_status = journal_batch_row[0][6]
+
+#     (batch_row_id, total_DR, total_CR) = batch_total(batch_row_id)
+
+#     return render_template('journals/batch_review.html',
+#                            batch_jes=batch_jes,
+#                            batch_row_id=batch_row_id,
+#                            batch_name=batch_name,
+#                            total_DR=total_DR,
+#                            total_CR=total_CR,
+#                            batch_gl_status=journal_batch_gl_status,
+#                            )
 
 
 @accounting_app_journals_bp.route('/journals/create_batch', methods=['GET', 'POST'])
@@ -314,7 +366,6 @@ def je_update(batch_row_id, journal_row_id):
     # Convert to SQL function for MariaDB
     _je = select_je_by_row_id(journal_table, journal_row_id)
 
-    # Add form to forms.py
     form = JournalUpdateForm()
 
     if form.validate_on_submit():
@@ -349,6 +400,8 @@ def je_update(batch_row_id, journal_row_id):
         _je_list[10] = form.gl_post_reference.data
         _je_list[11] = form.journal_entity.data
         _je_list[12] = form.journal_currency.data
+
+        print(f'updated JE: {_je_list}')
 
         flash("JE Updated")
 
