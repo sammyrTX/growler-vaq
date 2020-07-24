@@ -68,14 +68,14 @@ def select_batch_id(table, journal_batch_row_id):
     return execute_read_query(connection, select_batch_id)
 
 
-def batch_total(batch_row_id):
+def batch_total(table, batch_row_id):
 
     """For a given batch, total the debits and credits
     """
 
     connection = create_connection(**config)
 
-    dr_cr_totals_query = """SELECT journal_batch_row_id, sum(journal_debit), sum(journal_credit) FROM journal WHERE journal_batch_row_id = '""" + str(batch_row_id) + """' GROUP BY journal_batch_row_id"""
+    dr_cr_totals_query = """SELECT journal_batch_row_id, sum(journal_debit), sum(journal_credit) FROM """ + table + """ WHERE journal_batch_row_id = '""" + str(batch_row_id) + """' GROUP BY journal_batch_row_id"""
 
     dr_cr_totals = execute_read_query(connection, dr_cr_totals_query)
     dr_cr_totals_list = list(dr_cr_totals)

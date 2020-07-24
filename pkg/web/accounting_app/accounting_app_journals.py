@@ -38,6 +38,7 @@ from . forms import (JournalEntryForm,
 
 # Table names set up
 
+journal_loader_table = 'journal_loader'   # JE batch load staging table
 journal_batch_table = 'journal_batch'   # JE batch table
 journal_table = 'journal'
 entity_table = 'entity'   # Entity table
@@ -93,6 +94,10 @@ def load_batch(batch_row_id):
         else:
             return render_template('accounting_app_journals_bp/load_error.html')
 
+    print(f'>>>>> {select_batch_by_row_id(journal_batch_table, batch_row_id)}')
+
+    journal_batch_row = select_batch_by_row_id(journal_batch_table, batch_row_id)
+
     (batch_row_id,
      batch_name,
      batch_description,
@@ -100,7 +105,9 @@ def load_batch(batch_row_id):
      batch_currency,
      gl_post_reference,
      gl_batch_status,
-     ) = select_batch_by_row_id(journal_batch_table, batch_row_id)
+     ) = journal_batch_row[0]
+
+     # ) = select_batch_by_row_id(journal_batch_table, batch_row_id)
     # journal_batch_row = select_batch_by_row_id(journal_batch_table, batch_row_id)
     # journal_batch_name = journal_batch_row[0][1]
 
@@ -146,21 +153,40 @@ def journal_loader_batch_review(batch_row_id):
 
     # Get row for corresponding batch_row_id
     journal_batch_row = select_batch_by_row_id(journal_batch_table, batch_row_id)
+    print(f'journal_batch_row: {journal_batch_row}')
 
     # Get batch_name  for corresponding batch_row_id
     batch_name = journal_batch_row[0][1]
 
     # Get rows for corresponding batch_row_id in journal table
-    batch_jes = select_batch_by_row_id(journal_table, batch_row_id)
+    batch_jes = select_batch_by_row_id(journal_loader_table, batch_row_id)
 
     print('+' * 50)
     for _ in batch_jes:
-      print(f'{_}')
+        print(f'{_}')
     print('+' * 50)
     # Get gl status for corresponding batch_row_id
     journal_batch_gl_status = journal_batch_row[0][6]
 
-    (batch_row_id, total_DR, total_CR) = batch_total(batch_row_id)
+    print('=' * 50)
+    print(f'journal_batch_gl_status: {journal_batch_gl_status}')
+    print('=' * 50)
+
+    (batch_row_id, total_DR, total_CR) = batch_total(journal_loader_table, batch_row_id)
+
+    print('/' * 50)
+    print(f'batch_row_id: {batch_row_id}')
+    print(f'total_DR: {total_DR}')
+    print(f'total_CR: {total_CR}')
+    print('/' * 50)
+
+    # Flag to indicate source of JE's:
+    #  - "Staging" - journal_loader
+    #  - "General Journal" - journal
+
+    je_source = 'Staging'
+
+    print(f'end of endpoint processing before return render_template')
 
     return render_template('journals/batch_review.html',
                            batch_jes=batch_jes,
@@ -169,6 +195,7 @@ def journal_loader_batch_review(batch_row_id):
                            total_DR=total_DR,
                            total_CR=total_CR,
                            batch_gl_status=journal_batch_gl_status,
+                           je_source=je_source,
                            )
 
 

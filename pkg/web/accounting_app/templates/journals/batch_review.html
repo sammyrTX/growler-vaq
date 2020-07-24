@@ -4,18 +4,10 @@
 
 <div class="jumbotron">
 
-  <h1>Batch Review</h1>
+  <h1>Batch Review - {{ je_source }}</h1>
 
-  {% if batch_gl_status == 0 %}
+  <h3>Batch: <b>{{ batch_name }}</b></h3>
 
-  <h3><b>{{ batch_name }}</b></h3>
-
-  {% else %}
-
-  <h3><b>{{ batch_name }}</b></h3>
-
-  <p>Review journal entries and approve for posting</p>
-  <p>Click on individual journal entry to edit</p>
 </div>
 
 <!-- ################################################################################
@@ -117,7 +109,7 @@
 
 <br>
 
-{% endif %}
+<h2>BOTTOM OF HTML</h2>
 
 <!-- # how to format float to a number with $ and comma (omit $ if desired,
      # or add USD or GBP)
