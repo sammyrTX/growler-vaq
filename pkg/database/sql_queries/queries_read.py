@@ -46,13 +46,23 @@ def select_batch_by_row_id(table, journal_batch_row_id):
     return execute_read_query(connection, select_batch)
 
 
-def select_je_by_row_id(table, journal_row_id):
+def select_je_by_row_id(table, row_id):
     """Select row(s) from a table for a specific je joining
     on journal_row_id."""
 
+    # Set field depending on which table is being passed
+    if table == 'journal_loader':
+        row_field = 'journal_loader_id'
+    elif table == 'journal':
+        row_field = 'journal_row_id'
+    else:
+        row_field = 'table_not_found'
+
     connection = create_connection(**config)
 
-    select_je = """SELECT * FROM """ + table + """ WHERE journal_row_id = """ + str(journal_row_id) + """;"""
+    select_je = """SELECT * FROM """ + table + """ WHERE """ + row_field + """ = """ + str(row_id) + """;"""
+
+    print(f'>>>>>>>>> select_je: {select_je}')
 
     return execute_read_query(connection, select_je)
 

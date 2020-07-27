@@ -30,6 +30,9 @@ from ... database.sql_queries.queries_insert import (insert_new_batch_name,
                                                      batch_load_insert,
                                                      )
 
+from ... database.sql_queries.queries_update import je_transaction_update
+
+
 from . forms import (JournalEntryForm,
                      JournalUpdateForm,
                      BatchEntryForm,
@@ -383,37 +386,28 @@ def je_entry(journal_batch_row_id):
     return render_template('journals/journal_entry.html', form=form, dept_list=dept_list, journal_batch_row_id=journal_batch_row_id, batch_id=batch_id, batch_entity=batch_entity, batch_currency=batch_currency, entity_name=entity_name, currency__=currency__, account_list=account_list,)
 
 
-@accounting_app_journals_bp.route("/journals/je_update/<int:batch_row_id>/<int:journal_row_id>", methods=['GET', 'POST'])
+@accounting_app_journals_bp.route("/journals/je_update/<int:batch_row_id>/<int:row_id>", methods=['GET', 'POST'])
 # @login_required
-def je_update(batch_row_id, journal_row_id):
+def je_update(batch_row_id, row_id):
 
     """Edit selected journal entry from batch review HTML and update.
     """
 
     # Convert to SQL function for MariaDB
-    _je = select_je_by_row_id(journal_table, journal_row_id)
+    _je = select_je_by_row_id(journal_loader_table, row_id)
+
+    print(f'beginning of func _je_list: {_je}')
+
+    # Check _je
+    print('=' * 60)
+    print(f'_je: {_je}')
+    print('=' * 60)
 
     form = JournalUpdateForm()
 
     if form.validate_on_submit():
 
         _je_list = list(_je[0])
-
-        print(f'_je_list: {_je_list}')
-
-        # Convert to unpacking a tuple in next update
-        # _je.journal_date = form.journal_date.data
-        # _je.account_number = form.account_number.data
-        # _je.department_number = form.department_number.data
-        # _je.journal_entry_type = form.journal_entry_type.data
-        # _je.journal_debit = form.journal_debit.data
-        # _je.journal_credit = form.journal_credit.data
-        # _je.journal_description = form.journal_description.data
-        # _je.journal_reference = form.journal_reference.data
-        # _je.journal_batch_row_id = form.journal_batch_row_id.data
-        # _je.gl_post_reference = form.gl_post_reference.data
-        # _je.journal_entity = form.journal_entity.data
-        # _je.journal_currency = form.journal_currency.data
 
         _je_list[1] = form.journal_date.data
         _je_list[2] = form.account_number.data
@@ -428,23 +422,23 @@ def je_update(batch_row_id, journal_row_id):
         _je_list[11] = form.journal_entity.data
         _je_list[12] = form.journal_currency.data
 
-        print(f'updated JE: {_je_list}')
+        je_transaction_update(_je_list)
 
-        flash("JE Updated")
+        flash("*** JE Updated ***")
 
-        # Get row for corresponding batch_row_id
+        # Get row for batch in journal_batch
         journal_batch_row = select_batch_by_row_id(journal_batch_table, batch_row_id)
 
         # Get batch_name  for corresponding batch_row_id
         batch_name = journal_batch_row[0][1]
 
         # Get rows for corresponding batch_row_id in journal table
-        batch_jes = select_batch_by_row_id(journal_table, batch_row_id)
+        batch_jes = select_batch_by_row_id(journal_loader_table, batch_row_id)
 
         # Get gl status for corresponding batch_row_id
         journal_batch_gl_status = journal_batch_row[0][6]
 
-        (batch_row_id, total_DR, total_CR) = batch_total(batch_row_id)
+        (batch_row_id, total_DR, total_CR) = batch_total(journal_loader_table, batch_row_id)
 
         return render_template('journals/batch_review.html',
                                batch_jes=batch_jes,

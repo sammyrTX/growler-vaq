@@ -74,21 +74,21 @@
 
         </th> -->
 
-        <td><a href="{{url_for('accounting_app_journals_bp.je_update', batch_row_id=batch_row_id, journal_row_id=je[0])}}">
+        <td><a href="{{url_for('accounting_app_journals_bp.je_update', batch_row_id=batch_row_id, row_id=je[0])}}">
           {{ loop.index }}
         </a></td>
 
-        <td><a href="{{url_for('accounting_app_journals_bp.je_update', batch_row_id=batch_row_id, journal_row_id=je[0])}}">
+        <td><a href="{{url_for('accounting_app_journals_bp.je_update', batch_row_id=batch_row_id, row_id=je[0])}}">
             {{ je[1] }}
           </a> </td>
 
-        <td><a href="{{url_for('accounting_app_journals_bp.je_update', batch_row_id=batch_row_id, journal_row_id=je[0])}}">
+        <td><a href="{{url_for('accounting_app_journals_bp.je_update', batch_row_id=batch_row_id, row_id=je[0])}}">
             {{ je[7] }}
           </a> </td>
-        <td class="text-right"><a href="{{url_for('accounting_app_journals_bp.je_update', batch_row_id=batch_row_id, journal_row_id=je[0])}}">
+        <td class="text-right"><a href="{{url_for('accounting_app_journals_bp.je_update', batch_row_id=batch_row_id, row_id=je[0])}}">
             {{ "{:,.2f}".format(je[5]|float)}}
           </a> </td>
-        <td class="text-right"><a href="{{url_for('accounting_app_journals_bp.je_update', batch_row_id=batch_row_id, journal_row_id=je[0])}}">
+        <td class="text-right"><a href="{{url_for('accounting_app_journals_bp.je_update', batch_row_id=batch_row_id, row_id=je[0])}}">
             {{ "{:,.2f}".format(je[6]|float)}}
           </a> </td>
       </tr>
@@ -105,11 +105,6 @@
   </table>
 
 </div>
-
-
-<br>
-
-<h2>BOTTOM OF HTML</h2>
 
 <!-- # how to format float to a number with $ and comma (omit $ if desired,
      # or add USD or GBP)
