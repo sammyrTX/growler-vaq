@@ -21,7 +21,8 @@
 <form method="POST">
 
 
-  <button class="btn btn-success"> <a class="btn btn-success" href="{{url_for('accounting_app_gl_bp.general_ledger', batch_row_id=_batch_row_id)}}">Batch Ready - Post to GL </a></button>
+  <button class="btn btn-success"> <a class="btn btn-success" href="{{url_for('accounting_app_gl_bp.general_ledger', batch_row_id=_batch_row_id)}}">Batch Ready - Post to GL *** OLD ***</a></button>
+  <button class="btn btn-success"> <a class="btn btn-success" href="{{url_for('accounting_app_journals_bp.journal_loader_to_journal', batch_row_id=_batch_row_id)}}">Continue Load - Transfer to Journal </a></button>
 
 </form>
 

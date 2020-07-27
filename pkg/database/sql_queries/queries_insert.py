@@ -161,7 +161,7 @@ def update_batch_gl_status(batch_row_id, status):
 
 def batch_load_insert(batch_row_id):
 
-    """load rows for a batch_row_id from journals_loader and insert into journals
+    """load rows for a batch_row_id from journal_loader and insert into journals
     """
 
     try:

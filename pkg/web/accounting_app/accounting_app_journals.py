@@ -110,7 +110,7 @@ def load_batch(batch_row_id):
      gl_batch_status,
      ) = journal_batch_row[0]
 
-     # ) = select_batch_by_row_id(journal_batch_table, batch_row_id)
+    # ) = select_batch_by_row_id(journal_batch_table, batch_row_id)
     # journal_batch_row = select_batch_by_row_id(journal_batch_table, batch_row_id)
     # journal_batch_name = journal_batch_row[0][1]
 
@@ -123,20 +123,19 @@ def load_batch(batch_row_id):
                            )
 
 
-@accounting_app_journals_bp.route('/journals/placeholder')
-def journal_loader_to_journal_placeholder():
+@accounting_app_journals_bp.route('/journals/journal_loader_to_journal/<batch_row_id>', methods=['GET', 'POST'])
+def journal_loader_to_journal(batch_row_id):
 
-    """Placeholder to move batch data from journal loader to journal after"""
+    """Move batch transaction data from journal loader to journal"""
 
-    # load_status = batch_load_insert(batch_row_id)
+    load_status = batch_load_insert(batch_row_id)
 
-    # if load_status == "INSERT COMPLETE":
+    if load_status == "journal_load to journal INSERT COMPLETE":
 
-    #     return redirect(url_for('accounting_app_journals_bp.batch_review', batch_row_id=batch_row_id))
-    # else:
-
-    #     return render_template('accounting_app_journals_bp/load_error.html')
-    return '<h1>Journals - journal_loader to journal endpoint</h1>'
+        return redirect(url_for('accounting_app_journals_bp.journal_loader_batch_review', batch_row_id=batch_row_id))
+    else:
+        return render_template('accounting_app_journals_bp/load_error.html')
+    # return '<h1>Journals - journal_loader to journal endpoint</h1>'
 
 
 @accounting_app_journals_bp.route('/journals/journal_batch_load_error')
