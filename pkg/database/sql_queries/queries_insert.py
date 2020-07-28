@@ -166,7 +166,8 @@ def batch_load_insert(batch_row_id):
 
     try:
         connection = create_connection(**config)
-        insert_loader_to_journal = """INSERT INTO journal(journal_date, account_number, department_number, journal_entry_type, journal_debit, journal_credit, journal_description, journal_reference, journal_batch_row_id, gl_post_reference, journal_entity, journal_currency) SELECT journal_date, account_number, department_number, journal_entry_type, journal_debit, journal_credit, journal_description, journal_reference, journal_batch_row_id, gl_post_reference, journal_entity, journal_currency FROM journal_loader"""
+        insert_loader_to_journal = """INSERT INTO journal(journal_date, account_number, department_number, journal_entry_type, journal_debit, journal_credit, journal_description, journal_reference, journal_batch_row_id, gl_post_reference, journal_entity, journal_currency) SELECT journal_date, account_number, department_number, journal_entry_type, journal_debit, journal_credit, journal_description, journal_reference, journal_batch_row_id, gl_post_reference, journal_entity, journal_currency FROM journal_loader
+          WHERE journal_batch_row_id = """ + str(batch_row_id)
 
         execute_query(connection, insert_loader_to_journal)
 
@@ -211,7 +212,10 @@ if __name__ == "__main__":
     #                           1,
     #                           )
 
-    filename = 'je_load_kilo.csv'
-    batch_row_id = 2
+    # filename = 'je_load_kilo.csv'
+    # batch_row_id = 2
 
-    batch_load_je_file(filename, batch_row_id)
+    # batch_load_je_file(filename, batch_row_id)
+
+    batch_row_id = 1000
+    batch_load_insert(batch_row_id)

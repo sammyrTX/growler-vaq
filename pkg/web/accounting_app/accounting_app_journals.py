@@ -123,7 +123,7 @@ def load_batch(batch_row_id):
                            )
 
 
-@accounting_app_journals_bp.route('/journals/journal_loader_to_journal/<batch_row_id>', methods=['GET', 'POST'])
+@accounting_app_journals_bp.route('/journals/journal_loader_to_journal/<int:batch_row_id>', methods=['GET', 'POST'])
 def journal_loader_to_journal(batch_row_id):
 
     """Move batch transaction data from journal loader to journal"""
@@ -134,7 +134,7 @@ def journal_loader_to_journal(batch_row_id):
 
         return redirect(url_for('accounting_app_journals_bp.journal_loader_batch_review', batch_row_id=batch_row_id))
     else:
-        return render_template('accounting_app_journals_bp/load_error.html')
+        return render_template('journals/journal_batch_load_error.html')
     # return '<h1>Journals - journal_loader to journal endpoint</h1>'
 
 
