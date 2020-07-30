@@ -30,7 +30,8 @@
 {% else %}
 
 <button type="button" class="btn btn-warning font-weight-bold font-italic">Debits and Credits do not tie. Please review Journal Entries</button>
-
+  <a class="btn btn-primary" href="{{ url_for('accounting_app_journals_bp.batch_list') }}">Return to batch list</a>
+  
 {% endif %}
 
 <!-- ################################################################################-->
