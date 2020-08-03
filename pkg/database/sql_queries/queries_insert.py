@@ -172,8 +172,9 @@ def batch_load_insert(batch_row_id):
         execute_query(connection, insert_loader_to_journal)
 
         #  After loading journal table, delete rows from the loader table
-        clear_journal_loader = """DELETE FROM journal_loader WHERE batch_row_id = """ + str(batch_row_id)
+        clear_journal_loader = """DELETE FROM journal_loader WHERE journal_batch_row_id = """ + str(batch_row_id)
 
+        print(f'clear_journal_loader: {clear_journal_loader} <<<<<<<<<')
         execute_query(connection, clear_journal_loader)
 
         # Update batch status to "1"
@@ -217,5 +218,8 @@ if __name__ == "__main__":
 
     # batch_load_je_file(filename, batch_row_id)
 
-    batch_row_id = 1000
+    batch_row_id = 13
+
     batch_load_insert(batch_row_id)
+
+    print(f'load complete...verify {batch_row_id} is in journal and deleted from journal_loader...')
