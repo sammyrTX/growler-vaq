@@ -138,3 +138,39 @@ def general_ledger(batch_row_id):
     #                        gl_stage=gl_stage,
     #                        batch_id=batch_id,
     #                        )
+
+
+# Use code from this section to post batch to GL when ready
+
+# @accounting_app_journals_bp.route('/journals/journal_loader_batch_review/<int:batch_row_id>', methods=['GET', 'POST'])
+# def journal_loader_batch_review(batch_row_id):
+
+#     """Review JE's for a batch and mark ready to post to GL.
+#     """
+
+#     # Get row for corresponding batch_row_id
+#     journal_batch_row = select_batch_by_row_id(journal_batch_table, batch_row_id)
+
+#     # Get batch_name  for corresponding batch_row_id
+#     batch_name = journal_batch_row[0][1]
+
+#     # Get rows for corresponding batch_row_id in journal table
+#     batch_jes = select_batch_by_row_id(journal_table, batch_row_id)
+
+#     print('+' * 50)
+#     for _ in batch_jes:
+#       print(f'{_}')
+#     print('+' * 50)
+#     # Get gl status for corresponding batch_row_id
+#     journal_batch_gl_status = journal_batch_row[0][6]
+
+#     (batch_row_id, total_DR, total_CR) = batch_total(batch_row_id)
+
+#     return render_template('journals/batch_review.html',
+#                            batch_jes=batch_jes,
+#                            batch_row_id=batch_row_id,
+#                            batch_name=batch_name,
+#                            total_DR=total_DR,
+#                            total_CR=total_CR,
+#                            batch_gl_status=journal_batch_gl_status,
+#                            )

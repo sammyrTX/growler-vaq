@@ -36,12 +36,13 @@ def insert_new_batch_name(journal_batch_name,
 
     CODE         STATUS
     ----         --------------------------
-     0           New - Just created
-     1           Journal Entries have been assigned to this batch
-     2           Journal Entries have been aggregated and loaded into the
-                 gl staging table
-     3           gl staging data has been inserted into the general_ledger
-                 table and batch is now considered posted to the gl
+      0           New - Just created
+     10           Journal Entries have been assigned to this batch
+     20           Journal Entries have been posted to journal table
+     30           Journal Entries have been aggregated and loaded into the
+                  gl staging table
+     40           gl staging data has been inserted into the general_ledger
+                  table and batch is now considered posted to the gl
     """
 
     print('*' * 50)
@@ -130,6 +131,7 @@ def batch_load_je_file(filename, batch_row_id):
     finally:
         print(f"filename loaded to journal_loader: {filename}")
 
+    update_batch_gl_status(batch_row_id, 10)
     print(f"Load function end...Filename: {filename}")
     return "LOAD OK"
 
@@ -178,7 +180,7 @@ def batch_load_insert(batch_row_id):
         execute_query(connection, clear_journal_loader)
 
         # Update batch status to "1"
-        loader_to_journal_status = update_batch_gl_status(batch_row_id, 1)
+        loader_to_journal_status = update_batch_gl_status(batch_row_id, 20)
 
         if loader_to_journal_status == 'OK':
 

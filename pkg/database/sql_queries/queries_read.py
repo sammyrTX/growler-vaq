@@ -23,10 +23,10 @@ def select_all(table):
 
 def select_batch_available(table):
     """select all rows from journal_batch table that have not been posted
-    to the General Ledger (i.e. batch status not equal to 3)."""
+    to the journal table (i.e. batch status not equal to 20)."""
     connection = create_connection(**config)
 
-    select_batch = """SELECT * FROM """ + table + """ WHERE gl_batch_status <> 3 ORDER BY journal_batch_row_id DESC;"""
+    select_batch = """SELECT * FROM """ + table + """ WHERE gl_batch_status = 0 ORDER BY journal_batch_row_id DESC;"""
 
     print(f'{select_batch}')
 

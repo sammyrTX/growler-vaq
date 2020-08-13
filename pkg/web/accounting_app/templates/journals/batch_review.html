@@ -19,7 +19,7 @@
 {% if total_DR == total_CR and batch_gl_status == 0 %}
 
 <form method="POST">
-  <button class="btn btn-success"> <a class="btn btn-success" href="{{url_for('accounting_app_journals_bp.journal_loader_to_journal', batch_row_id=batch_row_id)}}">Continue Load - Transfer to Journal </a></button>
+  <button class="btn btn-success"> <a class="btn btn-success" href="{{url_for('accounting_app_journals_bp.journal_loader_to_journal', batch_row_id=batch_row_id)}}">Continue Load - <b>Transfer to Journal</b> </a></button>
 </form>
 
 {% elif batch_gl_status != 0 %}
@@ -31,7 +31,7 @@
 
 <button type="button" class="btn btn-warning font-weight-bold font-italic">Debits and Credits do not tie. Please review Journal Entries</button>
   <a class="btn btn-primary" href="{{ url_for('accounting_app_journals_bp.batch_list') }}">Return to batch list</a>
-  
+
 {% endif %}
 
 <!-- ################################################################################-->
