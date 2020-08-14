@@ -141,7 +141,7 @@ def journal_batch_load_error():
 @accounting_app_journals_bp.route('/journals/journal_loader_batch_review/<int:batch_row_id>', methods=['GET', 'POST'])
 def journal_loader_batch_review(batch_row_id):
 
-    """Review JE's loaded into staging table (journal_load) and mark ready to load into journal table.
+    """Review JE's loaded into staging table (journal_loader) and mark ready to load into journal table.
     """
 
     # Get row for corresponding batch_row_id

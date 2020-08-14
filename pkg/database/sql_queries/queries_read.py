@@ -26,7 +26,7 @@ def select_batch_available(table):
     to the journal table (i.e. batch status not equal to 20)."""
     connection = create_connection(**config)
 
-    select_batch = """SELECT * FROM """ + table + """ WHERE gl_batch_status = 0 ORDER BY journal_batch_row_id DESC;"""
+    select_batch = """SELECT * FROM """ + table + """ WHERE gl_batch_status in (0, 10) ORDER BY journal_batch_row_id DESC;"""
 
     print(f'{select_batch}')
 

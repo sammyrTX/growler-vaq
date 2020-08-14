@@ -15,7 +15,7 @@ from .. db_connection import (create_connection,
 
 # Valid status for the General Ledger posting process
 # See insert_new_batch_name for a description.
-valid_status = [0, 1, 2, 3, ]
+valid_status = [0, 10, 20, 30, 40]
 
 
 def insert_new_batch_name(journal_batch_name,
@@ -33,6 +33,7 @@ def insert_new_batch_name(journal_batch_name,
     with one entity.
 
     gl_batch_status will indicate which stage it is in the GL post process.
+    Need to update the valid_status list when making any changes.
 
     CODE         STATUS
     ----         --------------------------

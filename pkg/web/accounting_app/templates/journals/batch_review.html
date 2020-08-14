@@ -16,13 +16,13 @@
 
 <h3>Batch Status</h3>
 
-{% if total_DR == total_CR and batch_gl_status == 0 %}
+{% if total_DR == total_CR and batch_gl_status == 10 %}
 
 <form method="POST">
   <button class="btn btn-success"> <a class="btn btn-success" href="{{url_for('accounting_app_journals_bp.journal_loader_to_journal', batch_row_id=batch_row_id)}}">Continue Load - <b>Transfer to Journal</b> </a></button>
 </form>
 
-{% elif batch_gl_status != 0 %}
+{% elif batch_gl_status == 20 %}
 
   <a class="btn btn-secondary" href="#">Batch had been loaded to Journal</a>
   <a class="btn btn-primary" href="{{ url_for('accounting_app_journals_bp.batch_list') }}">Return to batch list</a>
@@ -36,6 +36,8 @@
 
 <!-- ################################################################################-->
 <br><br>
+
+{% if batch_gl_status == 10 %}
 
 <table class="table table-bordered">
   <thead>
@@ -108,6 +110,16 @@
   </table>
 
 </div>
+
+{% elif batch_gl_status == 20 %}
+
+  <h2>Journal Entries for {{ batch_name }} posted to Journal</h2>
+
+{% else %}
+
+<h2>System Error - Please contact your system administrator</h2>
+
+{% endif %}
 
 <!-- # how to format float to a number with $ and comma (omit $ if desired,
      # or add USD or GBP)
