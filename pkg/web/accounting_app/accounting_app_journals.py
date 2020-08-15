@@ -22,6 +22,7 @@ from ... database.sql_queries.queries_read import (select_all,
                                                    select_batch_by_row_id,
                                                    batch_total,
                                                    select_je_by_row_id,
+                                                   select_rowcount_row_id,
                                                    )
 
 from ... database.sql_queries.queries_insert import (insert_new_batch_name,
@@ -45,6 +46,9 @@ journal_loader_table = 'journal_loader'   # JE batch load staging table
 journal_batch_table = 'journal_batch'   # JE batch table
 journal_table = 'journal'
 entity_table = 'entity'   # Entity table
+
+# Empty journal_loader result set
+batch_jes_empty = ([0, 'NODATE', 0, 0, 0,  0.0, 0.0, 'NO DATA', '*******************', 0, '********', 0, 0])
 
 accounting_app_journals_bp = Blueprint('accounting_app_journals_bp',
                                        __name__,
@@ -148,8 +152,30 @@ def journal_loader_batch_review(batch_row_id):
     journal_batch_row = select_batch_by_row_id(journal_batch_table, batch_row_id)
     print(f'journal_batch_row: {journal_batch_row}')
 
-    # Get batch_name  for corresponding batch_row_id
+    # Get batch_name for corresponding batch_row_id
     batch_name = journal_batch_row[0][1]
+
+    # Check if the gl_batch_status is zero which indicates it is new with no
+    # data loaded or if the row count is zero
+
+    # Resume here
+    if journal_batch_row[0][6] == 0 or select_rowcount_row_id(journal_batch_table, batch_row_id) == 0:
+
+        je_source = 'New batch - no transactions'
+
+
+
+
+
+        return render_template('journals/batch_review.html',
+                               batch_jes=batch_jes_empty,
+                               batch_row_id=batch_row_id,
+                               batch_name=batch_name,
+                               total_DR=0.0,
+                               total_CR=0.0,
+                               batch_gl_status=journal_batch_gl_status,
+                               je_source=je_source,
+                               )
 
     # Get rows for corresponding batch_row_id in journal table
     batch_jes = select_batch_by_row_id(journal_loader_table, batch_row_id)
