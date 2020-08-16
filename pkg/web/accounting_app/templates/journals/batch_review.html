@@ -27,6 +27,10 @@
   <!-- <a class="btn btn-secondary" href="#">Batch loaded to Journal</a> -->
   <a class="btn btn-primary" href="{{ url_for('accounting_app_journals_bp.batch_list') }}">Return to batch list</a>
 
+{% elif batch_gl_status == 0 %}
+
+  <a class="btn btn-primary" href="{{ url_for('accounting_app_journals_bp.batch_list') }}">Return to batch list</a>
+
 {% else %}
 
 <button type="button" class="btn btn-warning font-weight-bold font-italic">Debits and Credits do not tie. Please review Journal Entries</button>
@@ -114,6 +118,10 @@
 {% elif batch_gl_status == 20 %}
 
   <h2>Journal Entries for {{ batch_name }} posted to Journal</h2>
+
+{% elif batch_gl_status == 0 %}
+
+  <h2>{{ batch_name }} - New batch, no journal entries loaded</h2>
 
 {% else %}
 

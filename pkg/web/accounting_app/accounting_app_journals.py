@@ -18,6 +18,7 @@ from ... database.db_connection import (create_connection,
 
 from ... database.sql_queries.queries_read import (select_all,
                                                    select_batch_available,
+                                                   select_batch_loaded,
                                                    select_entity_name_by_id,
                                                    select_batch_by_row_id,
                                                    batch_total,
@@ -158,14 +159,11 @@ def journal_loader_batch_review(batch_row_id):
     # Check if the gl_batch_status is zero which indicates it is new with no
     # data loaded or if the row count is zero
 
-    # Resume here
     if journal_batch_row[0][6] == 0 or select_rowcount_row_id(journal_batch_table, batch_row_id) == 0:
 
-        je_source = 'New batch - no transactions'
-
-
-
-
+        # Set to a 'no rows' status
+        je_source = 'New batch'
+        journal_batch_gl_status = 0
 
         return render_template('journals/batch_review.html',
                                batch_jes=batch_jes_empty,
@@ -203,7 +201,12 @@ def journal_loader_batch_review(batch_row_id):
     #  - "Staging" - journal_loader
     #  - "General Journal" - journal
 
-    je_source = 'Staging'
+    if journal_batch_gl_status == 10:
+        je_source = 'Staging'
+    elif journal_batch_gl_status == 20:
+        je_source = 'Transactions Loaded'
+    else:
+        je_source = '*****'
 
     print(f'end of endpoint processing before return render_template')
 
@@ -267,17 +270,19 @@ def create_batch():
 # @login_required
 def batch_list():
 
-    """A list of the available batches. This list will exclude batches that
-    have already posted. Select a batch to start adding journal entries or to
-    review for posting to the GL.
+    """A list of the available and loaded batches. Select a new batch to start adding journal entries or to review for posting to the GL.
     """
 
     batch_list = select_batch_available(journal_batch_table)
 
+    batch_list_loaded = select_batch_loaded(journal_batch_table)
+
     print(f'{batch_list}')
+    print(f'{batch_list_loaded}')
 
     return render_template('journals/batch_list.html',
                            batch_list=batch_list,
+                           batch_list_loaded=batch_list_loaded,
                            )
 
 

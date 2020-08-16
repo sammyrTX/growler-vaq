@@ -6,18 +6,17 @@
 
   <h1>Journal Batches</h1>
 
-  <p>Current pending batches</p>
-
 </div>
 
-<p>Click on Batch ID to begin entering Journal Entries</p>
-<p>Click on Review Batch to review and approve for posting</p>
+<p>LOAD JE FILE - Select csv file containing journal entries to load into Journal</p>
+<p>REVIEW TRANSACTIONS - Review journal entries before loading to Journal</p>
+
 <br>
 
 <table class="table table-striped table-hover">
   <thead>
     <tr>
-      <th scope="col">Batch ID</th>
+      <th scope="col">Batches Pending Load to Journal</th>
       <th scope="col"> </th>
     </tr>
   </thead>
@@ -36,5 +35,27 @@
 </table>
 
 <br><br>
+
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th scope="col">Batches loaded to Journal</th>
+      <th scope="col"> </th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for batch in batch_list_loaded %}
+
+    <tr>
+      <!-- <th scope="row">1</th> -->
+      <td><a href="#" class="list-group-item list-group-item-action">{{batch[1]}}</a></td>
+      <!-- <td><a class="btn btn-secondary" href="#">LOAD JE FILE</a></td>
+      <td><a class="btn btn-secondary" href="#">REVIEW TRANSACTIONS</a></td> -->
+    </tr>
+
+    {% endfor %}
+  </tbody>
+</table>
+
 
 {% endblock %}

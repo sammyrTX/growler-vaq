@@ -33,6 +33,18 @@ def select_batch_available(table):
     return execute_read_query(connection, select_batch)
 
 
+def select_batch_loaded(table):
+    """select all rows from journal_batch table that have been posted
+    to the journal table (i.e. batch status equal to 20)."""
+    connection = create_connection(**config)
+
+    select_batch = """SELECT * FROM """ + table + """ WHERE gl_batch_status = 20 ORDER BY journal_batch_row_id DESC;"""
+
+    print(f'{select_batch}')
+
+    return execute_read_query(connection, select_batch)
+
+
 def select_batch_by_row_id(table, journal_batch_row_id):
     """Select row(s) from a table for a specific batch joining
     on journal_batch_row_id."""
