@@ -36,8 +36,9 @@ class BatchEntryForm(FlaskForm):
     """Form to create a new Journal Entry Batch."""
     journal_batch_name = StringField('Batch Name', validators=[DataRequired()])
     journal_batch_description = StringField('Batch Description', validators=[DataRequired()])
-    journal_batch_entity = IntegerField('Entity', validators=[InputRequired()])
-    journal_batch_currency = IntegerField('Currency', validators=[InputRequired()])
+    journal_batch_entity = SelectField(u'Entity', choices=[('1', 'North America - USD'), ('2', 'UK - GBP'), ('3', 'Germany - EUR'), ('4', 'France - EUR')])
+    # journal_batch_entity = IntegerField('Entity', validators=[InputRequired()])
+    # journal_batch_currency = IntegerField('Currency', validators=[InputRequired()])
 
     enter = SubmitField('Create Batch')
 

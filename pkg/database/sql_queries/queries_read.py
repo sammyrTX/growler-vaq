@@ -159,3 +159,14 @@ def select_entity_name_by_id(table, journal_batch_entity):
 
     currency__ = Currency.query.filter_by(currency_id=batch_currency).first()
 
+
+def select_entity_list():
+    """Select all the rows from the entity table and the corresponding
+    currency names from the currency table. This can be used to populate a
+    drop down table."""
+
+    connection = create_connection(**config)
+
+    select_all_entities = """SELECT e.*, c.currency_code FROM entity e, currency c WHERE e.currency_id = c.currency_id ORDER BY e.entity_id"""
+
+    return execute_read_query(connection, select_all_entities)

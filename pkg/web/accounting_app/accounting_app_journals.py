@@ -24,6 +24,7 @@ from ... database.sql_queries.queries_read import (select_all,
                                                    batch_total,
                                                    select_je_by_row_id,
                                                    select_rowcount_row_id,
+                                                   select_entity_list,
                                                    )
 
 from ... database.sql_queries.queries_insert import (insert_new_batch_name,
@@ -230,21 +231,10 @@ def create_batch():
 
     form = BatchEntryForm()
 
-    entity_list = select_all('entity')
-    currency_list = select_all('currency')
+    entity_list = select_entity_list()
 
     # if form.validate_on_submit() is False:
     #     return render_template('accounting/acctg_message.html', form=form)
-
-    #  TODO  check form data here
-    print("############################################################")
-    print("### form.errors:                      ", form.errors)
-    print("### journal_batch_name.data:            ", form.journal_batch_name.data)
-    print("### form.journal_batch_desc.data:     ", form.journal_batch_description.data)
-    print("### form.journal_batch_entity.data:   ", form.journal_batch_entity.data)
-    print("### form.journal_batch_currency.data: ", form.journal_batch_currency.data)
-    print("### validate_on_submit:            ", form.validate_on_submit())
-    print("############################################################")
 
     if form.validate_on_submit():
         # Insert new batch data into journal_batch table
@@ -252,7 +242,7 @@ def create_batch():
         insert_new_batch_name(form.journal_batch_name.data,
                               form.journal_batch_description.data,
                               str(form.journal_batch_entity.data),
-                              str(form.journal_batch_currency.data),
+                              '0', # str(form.journal_batch_currency.data),
                               "NEED GL POST REF",  # default for new batch
                               "0",  # default for new batch
                               )
@@ -262,7 +252,6 @@ def create_batch():
 
     return render_template('journals/create_batch.html', form=form,
                            entity_list=entity_list,
-                           currency_list=currency_list,
                            )
 
 
