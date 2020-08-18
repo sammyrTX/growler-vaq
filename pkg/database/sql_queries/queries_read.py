@@ -35,10 +35,13 @@ def select_batch_available(table):
 
 def select_batch_loaded(table):
     """select all rows from journal_batch table that have been posted
-    to the journal table (i.e. batch status equal to 20)."""
+    to the journal table (i.e. batch status equal to 20). Include the total of debits and credits from the journal table."""
+
     connection = create_connection(**config)
 
-    select_batch = """SELECT * FROM """ + table + """ WHERE gl_batch_status = 20 ORDER BY journal_batch_row_id DESC;"""
+    # select_batch = """SELECT * FROM """ + table + """ WHERE gl_batch_status = 20 ORDER BY journal_batch_row_id DESC;"""
+
+    select_batch = """SELECT b.journal_batch_row_id, b.journal_batch_name, b.journal_batch_description, j.journal_batch_row_id, sum(j.journal_debit) as DR, sum(j.journal_credit) as CR FROM journal j, journal_batch b WHERE j.journal_batch_row_id = b.journal_batch_row_id group by j.journal_batch_row_id"""
 
     print(f'{select_batch}')
 

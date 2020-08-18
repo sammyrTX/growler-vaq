@@ -8,24 +8,37 @@
 
 </div>
 
-<p>LOAD JE FILE - Select csv file containing journal entries to load into Journal</p>
-<p>REVIEW TRANSACTIONS - Review journal entries before loading to Journal</p>
-
 <br>
 
-<table class="table table-striped table-hover">
+<h4>Batches Pending Load to Journal</h4>
+
+<table class="table table-striped table-hover w-auto">
+
   <thead>
     <tr>
-      <th scope="col">Batches Pending Load to Journal</th>
+      <th scope="col">#</th>
+      <th scope="col">id</th>
+      <th scope="col">Name</th>
+      <th scope="col"> </th>
       <th scope="col"> </th>
     </tr>
   </thead>
+
   <tbody>
     {% for batch in batch_list %}
 
+    <!-- <tr>
+      <td><a href="" class="list-group-item list-group-item-action">{{ loop.index }}</a></td>
+      <td><a href="" class="list-group-item list-group-item-action">{{batch[0]}}</a></td>
+      <td><a href="" class="list-group-item list-group-item-action">{{batch[1]}}</a></td>
+      <td><a class="btn btn-primary" href="{{url_for('accounting_app_journals_bp.load_batch', batch_row_id=batch[0])}}">LOAD JE FILE</a></td>
+      <td><a class="btn btn-primary" href="{{url_for('accounting_app_journals_bp.journal_loader_batch_review', batch_row_id=batch[0])}}">REVIEW TRANSACTIONS</a></td>
+    </tr> -->
+
     <tr>
-      <!-- <th scope="row">1</th> -->
-      <td><a href="#" class="list-group-item list-group-item-action">{{batch[1]}}</a></td>
+      <td>{{ loop.index }}</td>
+      <td>{{batch[0]}}</td>
+      <td>{{batch[1]}}</td>
       <td><a class="btn btn-primary" href="{{url_for('accounting_app_journals_bp.load_batch', batch_row_id=batch[0])}}">LOAD JE FILE</a></td>
       <td><a class="btn btn-primary" href="{{url_for('accounting_app_journals_bp.journal_loader_batch_review', batch_row_id=batch[0])}}">REVIEW TRANSACTIONS</a></td>
     </tr>
@@ -34,23 +47,50 @@
   </tbody>
 </table>
 
-<br><br>
+<br>
 
-<table class="table table-striped table-hover">
+<h4>Batches loaded to Journal</h4>
+
+<table class="table table-striped table-hover w-auto">
+
   <thead>
     <tr>
-      <th scope="col">Batches loaded to Journal</th>
-      <th scope="col"> </th>
+      <th scope="col">#</th>
+      <th scope="col">id</th>
+      <th scope="col">Name</th>
+      <th scope="col">Description</th>
+      <th class="text-right" scope="col">Debit</th>
+      <th class="text-right" scope="col">Credit</th>
     </tr>
   </thead>
+
+
   <tbody>
     {% for batch in batch_list_loaded %}
 
     <tr>
-      <!-- <th scope="row">1</th> -->
-      <td><a href="#" class="list-group-item list-group-item-action">{{batch[1]}}</a></td>
-      <!-- <td><a class="btn btn-secondary" href="#">LOAD JE FILE</a></td>
-      <td><a class="btn btn-secondary" href="#">REVIEW TRANSACTIONS</a></td> -->
+      <td>
+          {{ loop.index }}
+      </td>
+
+      <td>
+          {{ batch[0] }}
+      </td>
+
+      <td>
+          {{ batch[1] }}
+      </td>
+
+      <td>
+          {{ batch[2] }}
+      </td>
+
+      <td class="text-right">
+          {{ "{:,.2f}".format(batch[4]|float)}}
+      </td>
+      <td class="text-right">
+          {{ "{:,.2f}".format(batch[5]|float)}}
+      </td>
     </tr>
 
     {% endfor %}
