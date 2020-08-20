@@ -33,6 +33,7 @@ def select_batch_available(table):
     return execute_read_query(connection, select_batch)
 
 
+# ***** NEED TO HANDLE EMPTY RESULT SET *****    #TODO
 def select_batch_loaded(table):
     """select all rows from journal_batch table that have been posted
     to the journal table (i.e. batch status equal to 20). Include the total of debits and credits from the journal table."""
