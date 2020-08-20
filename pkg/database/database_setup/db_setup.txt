@@ -1,0 +1,248 @@
+"""SQL code to create the database infrastructure for the
+accounting system web app from scratch"""
+
+##################################################
+
+# Create the database
+
+CREATE DATABASE acctg_system;
+
+##################################################
+
+##################################################
+
+# Tables
+
+"""
+tables from rhino_striker
+
+-- DONE --
+
+class ChartOfAccounts(db.Model):
+class Departments(db.Model):
+class Periods(db.Model):
+class Group(db.Model):
+class JournalNames(db.Model):
+class Journal(db.Model):
+class Journal_Loader(db.Model):
+class GeneralLedger(db.Model):
+class GeneralLedger_Staging(db.Model):
+class Entity(db.Model):
+class Currency(db.Model):
+class JournalBatch(db.Model):
+class Xref_Batch_JE(db.Model):
+class Xref_Batch_GL(db.Model):
+class Xref_Batch_GL_Staging(db.Model):
+class AccountingUsers(db.Model, UserMixin):
+
+"""
+
+""" Chart of Accounts - Account numbers and associated names"""
+CREATE TABLE chart_of_accounts (
+id INT AUTO_INCREMENT PRIMARY KEY,
+account_number INT UNIQUE,
+account_name VARCHAR(50) UNIQUE,
+account_type INT
+);
+
+"""Department Numbers and associated names"""
+CREATE TABLE departments (
+id INT AUTO_INCREMENT PRIMARY KEY,
+department_number INT UNIQUE,
+department_name VARCHAR(50) UNIQUE
+);
+
+"""Calendar months assigned to an accounting period"""
+CREATE TABLE periods (
+period INT PRIMARY KEY,
+period_description CHAR(8) UNIQUE,
+period_begin CHAR(10) UNIQUE,
+period_end CHAR(10) UNIQUE
+);
+
+"""accounts group structures
+# This Model can be used as a sub-group or sub account
+# May need to create one for Account and Department separately
+"""
+CREATE TABLE group_tbl (
+id INT AUTO_INCREMENT PRIMARY KEY,
+group_number INT UNIQUE,
+account_id INT,
+account_name VARCHAR(50)
+);
+
+"""Journal names"""
+CREATE TABLE journal_names (
+id INT AUTO_INCREMENT PRIMARY KEY,
+journal_name VARCHAR(50)
+);
+
+"""Main table that will store the transactional detail for each journal.
+journal_row_id will be the key and is indexed. Foreign keys will be
+journal_batch_id and gl_post_reference which correspond to Batches and
+GL posts respectively.
+"""
+CREATE TABLE journal (
+journal_row_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+journal_date VARCHAR(20),
+account_number INT,
+department_number INT,
+journal_entry_type INT,
+journal_debit FLOAT,
+journal_credit FLOAT,
+journal_description VARCHAR(100),
+journal_reference VARCHAR(30),
+journal_batch_row_id INT,
+gl_post_reference VARCHAR(20),
+journal_entity INT,
+journal_currency INT
+);
+
+""Work table that will store the transactional detail loaded from a
+csv file. After validation, data will be inserted into the journals
+table.
+"""
+CREATE TABLE journal_loader (
+journal_loader_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+journal_date VARCHAR(20),
+account_number INT,
+department_number INT,
+journal_entry_type INT,
+journal_debit FLOAT,
+journal_credit FLOAT,
+journal_description VARCHAR(100),
+journal_reference VARCHAR(30),
+journal_batch_row_id INT,
+gl_post_reference VARCHAR(20),
+journal_entity INT,
+journal_currency INT
+);
+
+"""General Ledger table to store posted summary journal transactions.
+"""
+
+CREATE TABLE general_ledger (
+gl_id INT AUTO_INCREMENT PRIMARY KEY,
+gl_date VARCHAR(20),
+gl_post_reference VARCHAR(20),
+account_number INT,
+gl_type INT,
+gl_debit FLOAT,
+gl_credit FLOAT,
+gl_entity INT,
+gl_currency INT,
+gl_period INT
+);
+
+"""
+Staging table to aggregate journal transactions before inserting into the main General Ledger table.
+
+# General Ledger Loader Model
+#
+#   - Table for staging journal entry transactions to be inserted into
+#     the General Ledger table
+"""
+CREATE TABLE general_ledger_staging (
+gl_stage_id INT AUTO_INCREMENT PRIMARY KEY,
+gl_stage_date VARCHAR(20),
+gl_stage_post_reference VARCHAR(20),
+account_number INT,
+gl_stage_type INT,
+gl_stage_debit FLOAT,
+gl_stage_credit FLOAT,
+gl_stage_entity INT,
+gl_stage_currency INT
+);
+
+"""
+# Entity Model
+#
+#   - Table for Entities (e.g. North America, UK, etc.)
+
+Maintains the entities an organization may have. Some examples are
+by Geography (e.g. North America, APAC, United Kingdom). Or regional
+(e.g.West, Central, East, etc.) Also, assumption is that there is only
+one currency per entity.
+"""
+CREATE TABLE entity (
+entity_id INT AUTO_INCREMENT PRIMARY KEY,
+entity_name VARCHAR(50),
+entity_currency CHAR(3)
+);
+
+"""Existing currencies to be used in the system. Will need to implement
+an FX table to track history and to enable conversion to overall summary
+in USD (this system assumes USD is the local currency for the organiza-
+tion. Should be easy to change if required.)
+"""
+CREATE TABLE currency (
+currency_id INT AUTO_INCREMENT PRIMARY KEY,
+currency_code CHAR(3),
+currency_description VARCHAR(30)
+);
+
+"""Batches used to group journal entries. Each batch will be
+associated with a unique entity and currency combination, i.e.,
+je's for a given batch will only be in one currency and associated
+with one entity.
+
+gl_batch_status will indicate which stage it is in the GL post process.
+
+CODE         STATUS
+----         --------------------------
+ 0           New - Just created
+ 1           Journal Entries have been assigned to this batch
+ 2           Journal Entries have been aggregated and loaded into the
+             gl staging table
+ 3           gl staging data has been inserted into the general_ledger
+             table and batch is now considered posted to the gl
+"""
+CREATE TABLE journal_batch (
+journal_batch_row_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+journal_batch_name VARCHAR(30) UNIQUE,
+journal_batch_description VARCHAR(30),
+journal_batch_entity INT,
+journal_batch_currency INT,
+gl_post_reference CHAR(26),
+gl_batch_status INT
+);
+
+"""Cross reference table that links the batch to the journal entry.
+"""
+CREATE TABLE xref_batch_je (
+xref_id INT PRIMARY KEY,
+batch_row_id INT,
+journal_row_id INT
+);
+
+"""Cross reference table that links the batch to the GL post reference.
+"""
+
+CREATE TABLE xref_batch_GL (
+xref_id INT PRIMARY KEY,
+batch_row_id INT,
+gl_post_reference VARCHAR(20)
+);
+
+
+"""Cross reference table that links the batch to the GL post reference
+for the staging table.
+"""
+
+CREATE TABLE xref_batch_GL_staging (
+xref_staging_id INT PRIMARY KEY,
+batch_row_id INT,
+gl_post_reference VARCHAR(20)
+);
+
+"""Table for accounting system users"""
+
+CREATE TABLE accounting_users (
+id INT AUTO_INCREMENT PRIMARY KEY,
+email VARCHAR(64),
+username VARCHAR(64),
+password_hash VARCHAR(128)
+);
+
+
+##################################################

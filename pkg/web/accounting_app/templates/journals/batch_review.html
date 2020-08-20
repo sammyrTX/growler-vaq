@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="" style="padding-left: 20px;">
+
+    <div class="jumbotron">
+
+      <h1>Batch Review - {{ je_source }}</h1>
+
+      <h3>Batch: <b>{{ batch_name }}</b></h3>
+
+    </div>
+
+    <!-- ################################################################################
+    # Evaluate Debits vs Credits and indicate batch status for GL posting
+    -->
+
+    <h3>Batch Status</h3>
+
+    {% if total_DR == total_CR and batch_gl_status == 10 %}
+
+    <form method="POST">
+      <button class="btn btn-success"> <a class="btn btn-success" href="{{url_for('accounting_app_journals_bp.journal_loader_to_journal', batch_row_id=batch_row_id)}}">Continue Load - <b>Transfer to Journal</b> </a></button>
+    </form>
+
+    {% elif batch_gl_status == 20 %}
+
+      <!-- <a class="btn btn-secondary" href="#">Batch loaded to Journal</a> -->
+      <a class="btn btn-primary" href="{{ url_for('accounting_app_journals_bp.batch_list') }}">Return to batch list</a>
+
+    {% elif batch_gl_status == 0 %}
+
+      <a class="btn btn-primary" href="{{ url_for('accounting_app_journals_bp.batch_list') }}">Return to batch list</a>
+
+    {% else %}
+
+    <button type="button" class="btn btn-warning font-weight-bold font-italic">Debits and Credits do not tie. Please review Journal Entries</button>
+      <a class="btn btn-primary" href="{{ url_for('accounting_app_journals_bp.batch_list') }}">Return to batch list</a>
+
+    {% endif %}
+
+    <!-- ################################################################################-->
+    <br><br>
+
+    {% if batch_gl_status == 10 %}
+
+    <table class="table table-bordered w-auto">
+      <thead>
+        <tr>
+          <th scope="col">Debits</th>
+          <th scope="col">Credits</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <!-- <th scope="row">1</th> -->
+          <td>{{ "{:,.2f}".format(total_DR|float) }}</td>
+          <td>{{ "{:,.2f}".format(total_CR|float) }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <br>
+
+    <h3>Journal Entries</h3>
+
+    <div>
+
+      <table class="table table-striped table-hover w-auto">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Date</th>
+            <th scope="col">Description</th>
+            <th class="text-right" scope="col">Debit</th>
+            <th class="text-right" scope="col">Credit</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          {% for je in batch_jes %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ je[1] }}</td>
+              <td>{{ je[7] }}</td>
+              <td class="text-right">{{ "{:,.2f}".format(je[5]|float)}}</td>
+              <td class="text-right">{{ "{:,.2f}".format(je[6]|float)}}</td>
+            </tr>
+          {% endfor %}
+
+          <tr>
+            <td> </td>
+            <td> </td>
+            <td class="float-left"><b>Total</b></td>
+            <td class="text-right"><b>{{"{:,.2f}".format(total_DR|float)}}</b></td>
+            <td class="text-right"><b>{{ "{:,.2f}".format(total_CR|float) }}</b></td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+    {% elif batch_gl_status == 20 %}
+
+      <h2>Journal Entries for {{ batch_name }} posted to Journal</h2>
+
+    {% elif batch_gl_status == 0 %}
+
+      <h2>{{ batch_name }} - New batch, no journal entries loaded</h2>
+
+    {% else %}
+
+    <h2>System Error - Please contact your system administrator</h2>
+
+    {% endif %}
+</div>
+
+<!-- # how to format float to a number with $ and comma (omit $ if desired,
+     # or add USD or GBP)
+{{ "${:,.2f}".format(543921.9354) }} -->
+
+{% endblock %}

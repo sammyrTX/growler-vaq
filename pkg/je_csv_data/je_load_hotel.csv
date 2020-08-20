@@ -1,0 +1,3 @@
+journal_id,journal_date,account_number,department_number,journal_entry_type,journal_debit,journal_credit,journal_description,journal_reference,journal_batch_row_id,gl_post_reference,journal_entity,journal_currency
+,2019-10-15,6020,300,99,40100.79,0,mike transaction load,test load – HOTEL,200,,3,3
+,2019-10-16,2100,300,99,0,40100.79,mike transaction load,test load – HOTEL,200,,3,3

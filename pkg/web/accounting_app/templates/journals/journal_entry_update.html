@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Journal Entry Update</h1>
+
+<div class="container">
+  <form class="form-group" method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="form-group">
+      {{ form.journal_date.label(class="form-control-label") }}
+      {{ form.journal_date(class="form-control form-control-lg ") }}
+    </div>
+
+    <div class="form-group">
+      {{ form.account_number.label(class="form-control-label") }}
+      {{ form.account_number(class="form-control form-control-lg ") }}
+    </div>
+
+    <div class="form-group">
+      {{ form.department_number.label(class="form-control-label") }}
+      {{ form.department_number(class="form-control form-control-lg ") }}
+    </div>
+
+    <div class="form-group">
+      {{ form.journal_entry_type.label(class="form-control-label") }}
+      {{ form.journal_entry_type(class="form-control form-control-lg ") }}
+    </div>
+
+    <div class="form-group">
+      {{ form.journal_debit.label(class="form-control-label") }}
+      {{ form.journal_debit(class="form-control form-control-lg ") }}
+    </div>
+
+    <div class="form-group">
+      {{ form.journal_credit.label(class="form-control-label") }}
+      {{ form.journal_credit(class="form-control form-control-lg ") }}
+    </div>
+
+    <div class="form-group">
+      {{ form.journal_description.label(class="form-control-label") }}
+      {{ form.journal_description(class="form-control form-control-lg ") }}
+    </div>
+
+    <div class="form-group">
+      {{ form.journal_reference.label(class="form-control-label") }}
+      {{ form.journal_reference(class="form-control form-control-lg ") }}
+    </div>
+
+    <div class="form-group">
+      {{ form.journal_batch_row_id.label(class="form-control-label") }}
+      {{ form.journal_batch_row_id(class="form-control form-control-lg ") }}
+    </div>
+
+    <div class="form-group">
+      {{ form.gl_post_reference.label(class="form-control-label") }}
+      {{ form.gl_post_reference(class="form-control form-control-lg ") }}
+    </div>
+
+    <div class="form-group">
+      {{ form.journal_entity.label(class="form-control-label") }}
+      {{ form.journal_entity(class="form-control form-control-lg ") }}
+    </div>
+
+    <div class="form-group">
+      {{ form.journal_currency.label(class="form-control-label") }}
+      {{ form.journal_currency(class="form-control form-control-lg ") }}
+    </div>
+
+    <div class="form-group">
+      {{ form.enter(class="btn btn-outline-info") }}
+    </div>
+
+  </form>
+
+</div>
+
+{% if form.errors %}
+<p>{{ form.errors }}</p>
+{% endif %}
+
+{% endblock content %}

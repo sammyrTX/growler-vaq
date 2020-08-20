@@ -1,3 +1,7 @@
+# Config for MySQL
+pkg/database/db_config.py
+pkg/database/sql_queries/queries_test.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

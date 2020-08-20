@@ -1,0 +1,13 @@
+journal_id,journal_date,account_number,department_number,journal_entry_type,journal_debit,journal_credit,journal_description,journal_reference,journal_batch_row_id,gl_post_reference,journal_entity,journal_currency
+,2019-11-01,6070,500,99,700,0,test transaction v2 – expense-00,ref JE-LOAD-TEST-07,2,,1,1
+,2019-11-01,6070,500,99,33.25,0,test transaction v2 – expense-01,ref JE-LOAD-TEST-07,2,,1,1
+,2019-11-05,6070,500,99,1005.63,0,test transaction v2 – expense-02,ref JE-LOAD-TEST-07,2,,1,1
+,2019-11-01,2100,500,99,0,700,test transaction v2 – expense-00 AP,ref JE-LOAD-TEST-07,2,,1,1
+,2019-11-01,2100,500,99,0,33.25,test transaction v2 – expense-01 AP,ref JE-LOAD-TEST-07,2,,1,1
+,2019-11-05,2100,500,99,0,1005.63,test transaction v2 – expense-02 AP,ref JE-LOAD-TEST-07,2,,1,1
+,2019-11-01,2100,500,99,17.66,0,test transaction v2 – expense-00 AP – PAID,ref JE-LOAD-TEST-07,2,,1,1
+,2019-11-01,2100,500,99,256.44,0,test transaction v2 – expense-01 AP – PAID,ref JE-LOAD-TEST-07,2,,1,1
+,2019-11-05,2100,500,99,51.51,0,test transaction v2 – expense-02 AP – PAID,ref JE-LOAD-TEST-07,2,,1,1
+,2019-11-01,2100,500,99,0,17.66,test transaction v2 – expense-00 AP – PAID,ref JE-LOAD-TEST-07,2,,1,1
+,2019-11-01,2100,500,99,0,256.44,test transaction v2 – expense-01 AP – PAID,ref JE-LOAD-TEST-07,2,,1,1
+,2019-11-05,2100,500,99,0,51.51,test transaction v2 – expense-02 AP – PAID,ref JE-LOAD-TEST-07,2,,1,1

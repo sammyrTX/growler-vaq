@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="jumbotron">
+
+  <h2>Load Journal Entries for {{ journal_batch_name }} TEST TEST!!!</h2>
+<br>
+  <p>Open file and load journal entries</p>
+  <h3>{{ test_test }}</h3>
+</div>
+
+
+<br>
+<!--
+<form method="POST">
+  <div class="form-group">
+    <label for="exampleFormControlFile1">Choose Journal Entries file to open (must be csv format)</label>
+    <input type="file" class="form-control-file" id="exampleFormControlFile1">
+    <br>
+    <button class="btn btn-primary" type="submit">Load Journal Entry File</button>
+
+  </div>
+</form>
+ -->
+
+<div class="container">
+  <form class="form-group" method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="form-group">
+      {{ form.filename.label(class="form-control-label") }}
+      {{ form.filename(class="form-control-file") }}
+    </div>
+
+    <div class="form-group">
+      {{ form.enter(class="btn btn-primary") }}
+    </div>
+
+  </form>
+
+</div>
+
+<h2>Load Journal Entries for {{ journal_batch_name }}</h2>
+<br>
+<p>Open file and load journal entries</p>
+<h3>{{ test_test }}</h3>
+
+{% if form.errors %}
+<p>{{ form.errors }}</p>
+{% endif %}
+
+{% endblock %}
