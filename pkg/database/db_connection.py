@@ -29,7 +29,7 @@ def execute_query(connection, query):
     """Execute a SQL query passed as an argument"""
 
     # test
-    print(f'query argument: {query}')
+    # print(f'query argument: {query}')
     cursor = connection.cursor()
     try:
         cursor.execute(query)

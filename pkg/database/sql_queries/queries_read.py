@@ -33,7 +33,6 @@ def select_batch_available(table):
     return execute_read_query(connection, select_batch)
 
 
-# ***** NEED TO HANDLE EMPTY RESULT SET *****    #TODO
 def select_batch_loaded(table):
     """select all rows from journal_batch table that have been posted
     to the journal table (i.e. batch status equal to 20). Include the total of debits and credits from the journal table."""
@@ -42,7 +41,7 @@ def select_batch_loaded(table):
 
     # select_batch = """SELECT * FROM """ + table + """ WHERE gl_batch_status = 20 ORDER BY journal_batch_row_id DESC;"""
 
-    select_batch = """SELECT b.journal_batch_row_id, b.journal_batch_name, b.journal_batch_description, j.journal_batch_row_id, sum(j.journal_debit) as DR, sum(j.journal_credit) as CR FROM journal j, journal_batch b WHERE j.journal_batch_row_id = b.journal_batch_row_id group by j.journal_batch_row_id"""
+    select_batch = """SELECT b.journal_batch_row_id, b.journal_batch_name, b.journal_batch_description, j.journal_batch_row_id, sum(j.journal_debit) as DR, sum(j.journal_credit) as CR FROM journal j, journal_batch b WHERE j.journal_batch_row_id = b.journal_batch_row_id GROUP BY j.journal_batch_row_id ORDER BY j.journal_batch_row_id DESC"""
 
     print(f'{select_batch}')
 
@@ -92,6 +91,8 @@ def select_rowcount_row_id(table, row_id):
         row_field = 'journal_batch_row_id'
     elif table == 'journal':
         row_field = 'journal_row_id'
+    elif table == 'journal_batch':
+        row_field = 'journal_batch_row_id'
     else:
         row_field = 'table_not_found'
 
@@ -99,9 +100,9 @@ def select_rowcount_row_id(table, row_id):
 
     row_count = """SELECT count(*) FROM """ + table + """ WHERE """ + row_field + """ = """ + str(row_id) + """;"""
 
-    print(f'>>>>>>>>> row_count: {row_count}')
+    row_count_result = execute_read_query(connection, row_count)
 
-    return execute_read_query(connection, row_count)
+    return row_count_result[0][0]
 
 
 def select_batch_id(table, journal_batch_row_id):
