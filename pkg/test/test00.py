@@ -1,5 +1,9 @@
 """test file"""
 
+import mysql.connector
+# from mysql.connector import Error
+# from . db_config import config
+
 
 def func01():
     """Just return the int 42"""

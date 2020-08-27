@@ -2,12 +2,18 @@
 
 """Test SQL read queries."""
 
+import mysql.connector
+from mysql.connector import Error
+from .. database.db_config import config
+
 from .. database.db_connection import (create_connection,
                                        execute_query,
                                        execute_read_query,
                                        )
 
 from .. database.db_config import config
+
+from .. database.sql_queries import queries_read
 
 
 def select_all(table):
@@ -170,4 +176,20 @@ if __name__ == '__main__':
 
     for _ in result_set:
         print(_)
+    print('*' * 60)
+
+    print('')
+    print('*' * 60)
+
+    result_set = queries_read.select_batch_loaded('journal_batch')
+
+    print(f'result_set:')
+    print(f'{result_set}')
+    print('')
+    if result_set is None:
+        print('Result set is empty')
+    else:
+        print(f'Result set is not empty')
+
+
     print('*' * 60)
