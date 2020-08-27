@@ -31,6 +31,7 @@
           <td>{{batch[1]}}</td>
           <td><a class="btn btn-primary" href="{{url_for('accounting_app_journals_bp.load_batch', batch_row_id=batch[0])}}">LOAD JE FILE</a></td>
           <td><a class="btn btn-primary" href="{{url_for('accounting_app_journals_bp.journal_loader_batch_review', batch_row_id=batch[0])}}">REVIEW TRANSACTIONS</a></td>
+          <td><a class="btn btn-danger" href="{{url_for('accounting_app_journals_bp.batch_delete', journal_batch_row_id=batch[0])}}">DELETE BATCH</a></td>
         </tr>
       {% endfor %}
     </tbody>

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <!-- <h1 class="display-4">Batch Deleted</h1> -->
+    <h2>{{ delete_message }}</h2>
+    <br>
+    <a class="btn btn-primary" href="{{ url_for('accounting_app_journals_bp.batch_list') }}">Return to batch list</a>
+  </div>
+</div>
+
+<!-- <div class="container">
+
+  <h4>{{ marker }}</h4>
+
+</div> -->
+
+
+
+{% endblock %}

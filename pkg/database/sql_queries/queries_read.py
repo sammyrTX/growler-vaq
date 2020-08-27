@@ -173,3 +173,16 @@ def select_entity_list():
     select_all_entities = """SELECT e.*, c.currency_code FROM entity e, currency c WHERE e.currency_id = c.currency_id ORDER BY e.entity_id"""
 
     return execute_read_query(connection, select_all_entities)
+
+
+def get_gl_batch_status(journal_batch_row_id):
+    connection = create_connection(**config)
+
+    gl_batch_status = """SELECT gl_batch_status from journal_batch WHERE journal_batch_row_id = """ + str(journal_batch_row_id)
+
+    gl_batch_status_check = execute_read_query(connection, gl_batch_status)
+
+    if gl_batch_status_check is None:
+        return (99, 'Error - No journal batch row id found')
+    else:
+        return (gl_batch_status, 'OK')

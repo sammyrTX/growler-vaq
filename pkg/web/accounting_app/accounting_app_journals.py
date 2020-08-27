@@ -35,6 +35,7 @@ from ... database.sql_queries.queries_insert import (insert_new_batch_name,
 
 from ... database.sql_queries.queries_update import je_transaction_update
 
+from ... database.sql_queries.queries_delete import delete_journal_batch
 
 from . forms import (JournalEntryForm,
                      JournalUpdateForm,
@@ -239,4 +240,18 @@ def batch_list():
     return render_template('journals/batch_list.html',
                            batch_list=batch_list,
                            batch_list_loaded=batch_list_loaded,
+                           )
+
+
+@accounting_app_journals_bp.route('journals/batch_delete/<int:journal_batch_row_id>', methods=['GET', 'POST'])
+def batch_delete(journal_batch_row_id):
+
+    """Delete a batch that has not been loaded to the journal table.
+    """
+
+    delete_message = delete_journal_batch(journal_batch_row_id)
+
+    return render_template('journals/batch_deleted.html',
+                           journal_batch_row_id=journal_batch_row_id,
+                           delete_message=delete_message,
                            )
