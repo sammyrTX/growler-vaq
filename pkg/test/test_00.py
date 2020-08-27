@@ -29,5 +29,5 @@ def test_check02():
     assert(test_str == 'TESLA')
 
 
-if __name__ == '__main__':
-    pass
+# if __name__ == '__main__':
+#     pass

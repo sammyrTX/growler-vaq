@@ -1,6 +1,11 @@
 # test_sql_read.py
 
-"""Test SQL read queries."""
+"""Test SQL read queries
+
+    In order to run tests, run the following on the command line:
+       <project_root_directory>$ python3 -m pytest -v
+"""
+
 
 import mysql.connector
 from mysql.connector import Error
@@ -15,123 +20,38 @@ from .. database.db_config import config
 
 from .. database.sql_queries import queries_read
 
+from .. database.sql_queries.queries_read import (select_all,
+                                                  select_batch_available,
+                                                  select_batch_loaded,
+                                                  select_batch_by_row_id,
+                                                  select_je_by_row_id,
+                                                  select_rowcount_row_id,
+                                                  select_batch_id,
+                                                  batch_total,
+                                                  select_entity_name_by_id,
+                                                  select_entity_list,
+                                                  get_gl_batch_status,
+                                                  )
+
+"""
+Current READ queries:
 
 def select_all(table):
-    """select all rows from a given table"""
-    connection = create_connection(**config)
-
-    select_accts = "SELECT * FROM " + table
-
-    return execute_read_query(connection, select_accts)
-
-
 def select_batch_available(table):
-    """select all rows from journal_batch table that have not been posted
-    to the General Ledger (i.e. batch status not equal to 3)."""
-    connection = create_connection(**config)
-
-    select_batch = """SELECT * FROM """ + table + """ WHERE gl_batch_status <> 3 ORDER BY journal_batch_row_id DESC;"""
-
-    print(f'{select_batch}')
-
-    return execute_read_query(connection, select_batch)
-
-
+def select_batch_loaded(table):
 def select_batch_by_row_id(table, journal_batch_row_id):
-    """Select row(s) from a table for a specific batch joining
-    on journal_batch_row_id."""
-
-    connection = create_connection(**config)
-
-    print('******* in select_batch_by_id function **********')
-
-    select_batch = """SELECT * FROM """ + table + """ WHERE journal_batch_row_id = """ + str(journal_batch_row_id) + """;"""
-
-    return execute_read_query(connection, select_batch)
-
-
 def select_je_by_row_id(table, row_id):
-    """Select row(s) from a table for a specific je joining
-    on journal_row_id."""
-
-    # Set field depending on which table is being passed
-    if table == 'journal_loader':
-        row_field = 'journal_loader_id'
-    elif table == 'journal':
-        row_field = 'journal_row_id'
-    else:
-        row_field = 'table_not_found'
-
-    connection = create_connection(**config)
-
-    select_je = """SELECT * FROM """ + table + """ WHERE """ + row_field + """ = """ + str(row_id) + """;"""
-
-    print(f'>>>>>>>>> select_je: {select_je}')
-
-    return execute_read_query(connection, select_je)
-
-
+def select_rowcount_row_id(table, row_id):
 def select_batch_id(table, journal_batch_row_id):
-    """**** REVIEW  - May not need this function **** Get the batch_id from a journal table. One use is to obtain the batch id for transactions loaded into the journals_loader table."""
-
-    connection = create_connection(**config)
-
-    select_batch_id = """SELECT journal_batch_id FROM """ + table + """ GROUP BY journal_batch_id;"""
-
-    return execute_read_query(connection, select_batch_id)
-
-
 def batch_total(table, batch_row_id):
-
-    """For a given batch, total the debits and credits
-    """
-
-    connection = create_connection(**config)
-
-    dr_cr_totals_query = """SELECT journal_batch_row_id, sum(journal_debit), sum(journal_credit) FROM """ + table + """ WHERE journal_batch_row_id = '""" + str(batch_row_id) + """' GROUP BY journal_batch_row_id"""
-
-    dr_cr_totals = execute_read_query(connection, dr_cr_totals_query)
-    dr_cr_totals_list = list(dr_cr_totals)
-
-    if dr_cr_totals is None:
-
-        # Make DR != CR so HTML flags it as not ready to post to GL
-        print("FUNC: batch_total >>> ERROR", 999999, 888888)
-        return ("ERROR", 999999, 888888)
-
-    try:
-        print(f"FUNC: batch_total - journal_batch_row_id >>> {dr_cr_totals_list[0][0]}")
-        print(f"FUNC: batch_total  - dr total >>> {dr_cr_totals_list[0][1]}")
-        print(f"FUNC: batch_total - cr total >>> {dr_cr_totals_list[0][2]}")
-
-        return (dr_cr_totals_list[0][0],
-                dr_cr_totals_list[0][1],
-                dr_cr_totals_list[0][2],
-                )
-    except IndexError:
-        print("IndexError!")
-        return ("INDEX ERROR",
-                999999,
-                888888,  #  Make different so flagged as not ready to post
-                )
-
-
 def select_entity_name_by_id(table, journal_batch_entity):
-    """Select the corresponding entity name for the given entity id from the
-    journal entry batch.
-    """
-
-    connection = create_connection(**config)
-
-    select_entity = """SELECT entity_name FROM """ + table + """ WHERE entity_id = """ + str(journal_batch_entity) + """;"""
-
-    return execute_read_query(connection, select_entity)
-
-    currency__ = Currency.query.filter_by(currency_id=batch_currency).first()
+def select_entity_list():
+def get_gl_batch_status(journal_batch_row_id):
+"""
 
 # Test functions to be used with pytest
-
 value = 4000
+
 
 def test_value():
     value_to_test = 4000
@@ -140,7 +60,6 @@ def test_value():
 
 
 def test_query():
-    pass
     table = 'chart_of_accounts'
     rows = select_all(table)
     # row_count = rows.count('\n')
@@ -153,9 +72,11 @@ def test_query():
 
 
 def test_query02():
-    test_value = (9, 'hotel-072820', 'hotel batch - test', 1, 1, 'NEED GL POST REF', 1)
+    # test_value = (9, 'hotel-072820', 'hotel batch - test', 1, 1, 'NEED GL POST REF', 1)
+    test_value = (33, 'take 5', '888', 1, 0, 'NEED GL POST REF', 10)
+
     table = 'journal_batch'
-    journal_batch_row_id = 9
+    journal_batch_row_id = 33
     row = select_batch_by_row_id(table, journal_batch_row_id)
     row = row[0]
 
