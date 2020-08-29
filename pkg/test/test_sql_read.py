@@ -36,8 +36,8 @@ from .. database.sql_queries.queries_read import (select_all,
 """
 Current READ queries:
 
-def select_all(table):
-def select_batch_available(table):
+x def select_all(table):
+x def select_batch_available(table):
 def select_batch_loaded(table):
 def select_batch_by_row_id(table, journal_batch_row_id):
 def select_je_by_row_id(table, row_id):
@@ -59,16 +59,42 @@ def test_value():
     assert(value == value_to_test)
 
 
-def test_query():
-    table = 'chart_of_accounts'
+def test_func_select_all():
+    """Check row count from select_all function"""
+
+    table = 'z_test_table_00'
+    test_row_0 = (1, 'sample', 11.99)
     rows = select_all(table)
-    # row_count = rows.count('\n')
-    row_count = 0
+    rows_count = len(rows)
+    test_value = 6
 
-    for _ in rows:
-        row_count +=1
+    assert(rows_count == test_value)
+    assert(rows[0] == test_row_0)
 
-    assert(row_count > 0)
+
+def test_func_select_batch_available():
+    """Check batches that should be available. gl_batch_status should
+       not equal 20."""
+    table = 'z_test_journal_batch'
+    test_value = [(33, 'test-01', '888', 1, 0, 'NEED GL POST REF', 10), (32, 'test-00', 'lll', 1, 0, 'NEED GL POST REF', 10)]
+    rows = select_batch_available(table)
+
+    assert(rows == test_value)
+
+
+# TODO
+# Resume work here
+def test_func_select_batch_loaded_test_not_ready():
+    """Check batches that have posted to the journal table."""
+
+    # Need to determine which tables to use for this test
+    # Test tables or production tables in the development environment
+    table = 'z_test_journal_batch'
+    test_value = [(99, 'test-01', '888', 1, 0, 'NEED GL POST REF', 10), (32, 'test-00', 'lll', 1, 0, 'NEED GL POST REF', 10)]
+    # test_value = [(33, 'test-01', '888', 1, 0, 'NEED GL POST REF', 10), (32, 'test-00', 'lll', 1, 0, 'NEED GL POST REF', 10)]
+    rows = select_batch_available(table)
+
+    assert(rows == test_value)
 
 
 def test_query02():
@@ -112,5 +138,27 @@ if __name__ == '__main__':
     else:
         print(f'Result set is not empty')
 
+    print('*' * 60)
+
+    check_output = select_all('z_test_table_00')
+    print('check_output:')
+    print(f'{check_output}')
+    print(f'items in check_output: {len(check_output)}')
+    print('*' * 60)
+
+    print('*' * 60)
+
+    check_output = select_batch_available('z_test_journal_batch')
+    print('check_output:')
+    print(f'{check_output}')
+    print(f'items in check_output: {len(check_output)}')
+    print('*' * 60)
+
+    print('*' * 60)
+
+    check_output = select_batch_loaded('z_test_journal_batch')
+    print('check_output:')
+    print(f'{check_output}')
+    print(f'items in check_output: {len(check_output)}')
 
     print('*' * 60)

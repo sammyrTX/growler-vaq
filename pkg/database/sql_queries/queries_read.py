@@ -34,14 +34,14 @@ def select_batch_available(table):
 
 
 def select_batch_loaded(table):
-    """select all rows from journal_batch table that have been posted
-    to the journal table (i.e. batch status equal to 20). Include the total of debits and credits from the journal table."""
+    """Select all rows from journal_batch table that have been posted
+    to the journal table.
+
+    This is an inner join on journal_batch.journal_batch_row_id to journal table rows that have the same journal_batch_row_id. Include the total of debits and credits from the journal table. This query will select rows from journal table regardless of gl_batch_status (which should be 20 if posted to the journal table."""
 
     connection = create_connection(**config)
 
-    # select_batch = """SELECT * FROM """ + table + """ WHERE gl_batch_status = 20 ORDER BY journal_batch_row_id DESC;"""
-
-    select_batch = """SELECT b.journal_batch_row_id, b.journal_batch_name, b.journal_batch_description, j.journal_batch_row_id, sum(j.journal_debit) as DR, sum(j.journal_credit) as CR FROM journal j, journal_batch b WHERE j.journal_batch_row_id = b.journal_batch_row_id GROUP BY j.journal_batch_row_id ORDER BY j.journal_batch_row_id DESC"""
+    select_batch = """SELECT b.journal_batch_row_id, b.journal_batch_name, b.journal_batch_description, j.journal_batch_row_id, sum(j.journal_debit) as DR, sum(j.journal_credit) as CR FROM journal j, """ + table + """ b WHERE j.journal_batch_row_id = b.journal_batch_row_id GROUP BY j.journal_batch_row_id ORDER BY j.journal_batch_row_id DESC"""
 
     print(f'{select_batch}')
 
