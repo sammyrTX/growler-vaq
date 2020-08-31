@@ -33,6 +33,9 @@ from .. database.sql_queries.queries_read import (select_all,
                                                   get_gl_batch_status,
                                                   )
 
+from .. database.sql_queries.queries_insert import (batch_load_je_file,
+                                                    )
+
 """
 Current READ queries:
 
@@ -75,26 +78,47 @@ def test_func_select_all():
 def test_func_select_batch_available():
     """Check batches that should be available. gl_batch_status should
        not equal 20."""
-    table = 'z_test_journal_batch'
-    test_value = [(33, 'test-01', '888', 1, 0, 'NEED GL POST REF', 10), (32, 'test-00', 'lll', 1, 0, 'NEED GL POST REF', 10)]
-    rows = select_batch_available(table)
+    # table = 'z_test_journal_batch'
+    # test_value = [(33, 'test-01', '888', 1, 0, 'NEED GL POST REF', 10), (32, 'test-00', 'lll', 1, 0, 'NEED GL POST REF', 10)]
+    # rows = select_batch_available(table)
 
-    assert(rows == test_value)
+    # assert(rows == test_value)
 
 
 # TODO
 # Resume work here
-def test_func_select_batch_loaded_test_not_ready():
+
+def test_csv_load_process_not_ready():
+    # Set up csv file to use
+    filename = 'test01.csv'
+    batch_row_id = 100
+
+    # Load csv file to journal_loader
+    load_file = batch_load_je_file(filename, batch_row_id)
+
+    if load_file == 'LOAD OK':
+        status = 1
+    else:
+        status = 99
+
+    assert(status == 1)
+
+
+# def test_func_select_batch_loaded_test_not_ready():
     """Check batches that have posted to the journal table."""
 
-    # Need to determine which tables to use for this test
-    # Test tables or production tables in the development environment
-    table = 'z_test_journal_batch'
-    test_value = [(99, 'test-01', '888', 1, 0, 'NEED GL POST REF', 10), (32, 'test-00', 'lll', 1, 0, 'NEED GL POST REF', 10)]
-    # test_value = [(33, 'test-01', '888', 1, 0, 'NEED GL POST REF', 10), (32, 'test-00', 'lll', 1, 0, 'NEED GL POST REF', 10)]
-    rows = select_batch_available(table)
+    # # test-csv_out01 Totals: DR/CR = 2,545,558.99
+    # dr_cr_total = 2545558.99
 
-    assert(rows == test_value)
+    # # Need to determine which tables to use for this test
+    # # Test tables or production tables in the development environment
+    # table = 'z_test_journal_batch'
+    # test_value = [(99, 'test-01', '888', 1, 0, 'NEED GL POST REF', 10), (32, 'test-00', 'lll', 1, 0, 'NEED GL POST REF', 10)]
+    # # test_value = [(33, 'test-01', '888', 1, 0, 'NEED GL POST REF', 10), (32, 'test-00', 'lll', 1, 0, 'NEED GL POST REF', 10)]
+    # rows = select_batch_available(table)
+
+    # assert(dr_cr_total == 2545558.99)
+    # assert(rows == test_value)
 
 
 def test_query02():

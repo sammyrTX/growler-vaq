@@ -185,7 +185,7 @@ def batch_load_insert(batch_row_id):
 
         if loader_to_journal_status == 'OK':
 
-            load_status = "journal_load to journal INSERT COMPLETE"
+            load_status = "journal_loader to journal INSERT COMPLETE"
             print(f"*** INSERT COMPLETE ***")
         else:
             load_status = 'ERROR with Loader to Journals table'
