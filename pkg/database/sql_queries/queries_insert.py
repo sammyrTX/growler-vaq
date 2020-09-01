@@ -1,6 +1,7 @@
 # queries_insert.py
 
 """SQL insert queries."""
+import sys
 import csv
 import mysql.connector
 
@@ -124,10 +125,16 @@ def batch_load_je_file(filename, batch_row_id):
 
                     execute_query(connection, je_row_insert_query)
                     line_count += 1
-            print(f"rows inserted: {line_count}")
+                    print(f'>>> {sys.exc_info()[0]}')
 
     except ConnectionError as error:
         print("Failed to insert data into je table", error)
+
+    except mysql.connector.Error as err:
+        print(err)
+        print("Error Code:", err.errno)
+        print("SQLSTATE", err.sqlstate)
+        print("Message", err.msg)
 
     finally:
         print(f"filename loaded to journal_loader: {filename}")

@@ -10,13 +10,10 @@
 import mysql.connector
 from mysql.connector import Error
 from .. database.db_config import config
-
 from .. database.db_connection import (create_connection,
                                        execute_query,
                                        execute_read_query,
                                        )
-
-from .. database.db_config import config
 
 from .. database.sql_queries import queries_read
 
@@ -34,7 +31,10 @@ from .. database.sql_queries.queries_read import (select_all,
                                                   )
 
 from .. database.sql_queries.queries_insert import (batch_load_je_file,
+                                                    insert_new_batch_name,
                                                     )
+
+import pandas as pd
 
 """
 Current READ queries:
@@ -54,6 +54,26 @@ def get_gl_batch_status(journal_batch_row_id):
 
 # Test functions to be used with pytest
 value = 4000
+
+
+def get_journal_batch_row_id_by_name(journal_batch_name):
+    """Get the journal_batch_row_id by journal_batch_name"""
+
+    try:
+        connection = create_connection(**config)
+
+        row_id_qry = """SELECT journal_batch_row_id from journal_batch WHERE journal_batch_name = '""" + journal_batch_name + """'"""
+
+        row_id_out = execute_read_query(connection, row_id_qry)
+
+        if row_id_out is None:
+            return (0, 'Error - No journal batch row id found')
+        else:
+            row_id = row_id_out[0][0]
+            return (row_id_out, 'OK')
+    except Error:
+        print('*** ERROR ***')
+        return (99, '*** Error***')
 
 
 def test_value():
@@ -87,21 +107,47 @@ def test_func_select_batch_available():
 
 # TODO
 # Resume work here
+# Implement pandas in order to check summary data for csv file that is
+# loaded.
 
 def test_csv_load_process_not_ready():
+    # Create batch for testing
+    journal_batch_name = 'pytest-test_csv_load5'
+    journal_batch_description = 'test01.csv'
+    journal_batch_entity = 1
+    journal_batch_currency = 1
+    gl_post_reference = 'NULL'
+    gl_batch_status = 0
+
+    insert_new_batch_name(journal_batch_name,
+                          journal_batch_description,
+                          str(journal_batch_entity),
+                          str(journal_batch_currency),
+                          gl_post_reference,
+                          str(gl_batch_status),
+                          )
+
     # Set up csv file to use
     filename = 'test01.csv'
-    batch_row_id = 100
+    batch_row_id = get_journal_batch_row_id_by_name(journal_batch_name)
+    print(f'journal_batch_name: {journal_batch_name}')
+    print(f'batch_row_id: {batch_row_id}')
+    batch_row_id = batch_row_id[0]
+    print(f'batch_row_id: {batch_row_id}')
 
     # Load csv file to journal_loader
-    load_file = batch_load_je_file(filename, batch_row_id)
+    load_file = batch_load_je_file(filename, str(batch_row_id))
+    print('=' * 80)
 
+    print(f'load_file: {load_file}')
+
+    print('=' * 80)
     if load_file == 'LOAD OK':
-        status = 1
+        status_ = 2
     else:
-        status = 99
+        status_ = 99
 
-    assert(status == 1)
+    assert(status_ == 1)
 
 
 # def test_func_select_batch_loaded_test_not_ready():
@@ -121,16 +167,17 @@ def test_csv_load_process_not_ready():
     # assert(rows == test_value)
 
 
-def test_query02():
+def test_query02_not_used():
+    pass
     # test_value = (9, 'hotel-072820', 'hotel batch - test', 1, 1, 'NEED GL POST REF', 1)
-    test_value = (33, 'take 5', '888', 1, 0, 'NEED GL POST REF', 10)
+    # test_value = (33, 'take 5', '888', 1, 0, 'NEED GL POST REF', 10)
 
-    table = 'journal_batch'
-    journal_batch_row_id = 33
-    row = select_batch_by_row_id(table, journal_batch_row_id)
-    row = row[0]
+    # table = 'journal_batch'
+    # journal_batch_row_id = 33
+    # row = select_batch_by_row_id(table, journal_batch_row_id)
+    # row = row[0]
 
-    assert(row == test_value)
+    # assert(row == test_value)
 
 
 if __name__ == '__main__':
