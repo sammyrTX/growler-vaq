@@ -19,6 +19,8 @@ def create_connection(user, password, host, database):
         print("Connection to MySQL DB successful")
     except ConnectionError as e:
         print(f"The connection error '{e}' occurred")
+    except mysql.connector.Error as err:
+        print(f'Something went wrong: {err}')
     except Error as e:
         print(f"The error '{e}' occurred")
 
