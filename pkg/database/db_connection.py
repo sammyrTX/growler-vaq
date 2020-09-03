@@ -30,15 +30,20 @@ def create_connection(user, password, host, database):
 def execute_query(connection, query):
     """Execute a SQL query passed as an argument"""
 
-    # test
-    # print(f'query argument: {query}')
     cursor = connection.cursor()
     try:
         cursor.execute(query)
         connection.commit()
-        print("Query executed successfully")
+        return "Query executed successfully"
     except Error as e:
-        print(f"The error '{e}' occurred")
+        return f'The error "{e}" occurred'
+    # Original code
+    # try:
+    #     cursor.execute(query)
+    #     connection.commit()
+    #     print("Query executed successfully")
+    # except Error as e:
+    #     print(f"The error '{e}' occurred")
 
 
 def execute_read_query(connection, query):

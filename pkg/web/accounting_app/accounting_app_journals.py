@@ -93,7 +93,7 @@ def load_batch(batch_row_id):
         # load CSV data into staging table (journal_loader)
         load_file = batch_load_je_file(filename, batch_row_id)
 
-        if load_file == "LOAD OK":
+        if load_file == "LOAD OKAY":
             return redirect(url_for('accounting_app_journals_bp.journal_loader_batch_review', batch_row_id=batch_row_id))
         else:
             return render_template('accounting_app_journals_bp/load_error.html')

@@ -113,60 +113,53 @@ def batch_load_je_file(filename, batch_row_id):
     try:
         connection = create_connection(**config)
         print(f"Successfully connected to ({config['database']})")
-
     except ConnectionError as error:
-        print("Failed to insert data into je table", error)
+        print("Failed to connect ", error)
 
     #  Open csv file to load
-    try:
-        with open(working_data_folder + filename) as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=',')
+    with open(working_data_folder + filename) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
 
-            line_count = 0
+        line_count = 0
 
-            for row in csv_reader:
-                if line_count == 0:
+        for row in csv_reader:
+            if line_count == 0:
+                line_count += 1
+            else:
+                je_row_insert_query = """INSERT INTO journal_loader(journal_date, account_number, department_number, journal_entry_type, journal_debit, journal_credit, journal_description, journal_reference, journal_batch_row_id, gl_post_reference, journal_entity, journal_currency) VALUES('""" + row[1] + """', """ + row[2] + """, """ + row[3] + """, """ + row[4] + """, """ + row[5] + """, """ + row[6] + """, '""" + row[7] + """', '""" + row[8] + """', """ + str(batch_row_id) + """, '""" + row[10] + """', """ + row[11] + """, """ + row[12] + """)"""
+
+                result = execute_query(connection, je_row_insert_query)
+                print(f'result: {result}')
+
+                if result == 'Query executed successfully':
                     line_count += 1
+                    print(f'line count: {line_count}')
+                    load_status = 'LOAD OKAY'
+                    print('+' * 100)
                 else:
-                    je_row_insert_query = """INSERT INTO journal_loader(journal_date, account_number, department_number, journal_entry_type, journal_debit, journal_credit, journal_description, journal_reference, journal_batch_row_id, gl_post_reference, journal_entity, journal_currency) VALUES('""" + row[1] + """', """ + row[2] + """, """ + row[3] + """, """ + row[4] + """, """ + row[5] + """, """ + row[6] + """, '""" + row[7] + """', '""" + row[8] + """', """ + str(batch_row_id) + """, '""" + row[10] + """', """ + row[11] + """, """ + row[12] + """)"""
-                    try:
-                        execute_query(connection, je_row_insert_query)
-                        line_count += 1
-                        print(f'line count: {line_count}')
-                        print('+' * 100)
-                    except mysql.Error as err:
-                        print(err)
-                        print("Error Code:", err.errno)
-                        print("SQLSTATE", err.sqlstate)
-                        print("Message", err.msg)
-                        load_status = 'LOAD ERROR0'
-                    except Error as err:
-                        print(err)
-                        print("Error Code:", err.errno)
-                        print("SQLSTATE", err.sqlstate)
-                        print("Message", err.msg)
-                        load_status = 'LOAD ERROR'
+                    print(f'ERROR: {result}')
+                    load_status = 'LOAD ERROR'
+                    break
 
-    except mysql.connector.errors.Error as err:
-        print(err)
-        print("Error Code:", err.errno)
-        print("SQLSTATE", err.sqlstate)
-        print("Message", err.msg)
-        load_status = 'LOAD ERROR2'
-
+        connection.close()
     # finally:
     #     print(f"filename loaded to journal_loader: {filename}")
-
+    print('>>>>>>')
     print(f'>>>>>> Load status: {load_status}')
+    print('>>>>>>')
 
     if load_status == 'LOAD ERROR':
         update_batch_gl_status(batch_row_id, 99)
         print(f"Load Error...Filename: {filename}")
         return "LOAD ERROR"
-    else:
+    elif load_status == 'LOAD OKAY':
         update_batch_gl_status(batch_row_id, 10)
         print(f"Load function end...Filename: {filename}")
-        return "LOAD OK"
+        return load_status
+    else:
+        update_batch_gl_status(batch_row_id, 98)
+        print(f"Load Error other...Filename: {filename}")
+        return "LOAD ERROR OTHER"
 
 
 def update_batch_gl_status(batch_row_id, status):
