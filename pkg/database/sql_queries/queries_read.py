@@ -11,6 +11,8 @@ from .. db_connection import (create_connection,
 
 from .. db_config import config
 
+import mysql.connector
+from mysql.connector import Error
 
 def select_all(table):
     """select all rows from a given table"""
@@ -188,3 +190,23 @@ def get_gl_batch_status(journal_batch_row_id):
         return (99, 'Error - No journal batch row id found')
     else:
         return (gl_batch_status, 'OK')
+
+
+def get_journal_batch_row_id_by_name(journal_batch_name):
+    """Get the journal_batch_row_id by journal_batch_name"""
+
+    try:
+        connection = create_connection(**config)
+
+        row_id_qry = """SELECT journal_batch_row_id from journal_batch WHERE journal_batch_name = '""" + journal_batch_name + """'"""
+
+        row_id_out = execute_read_query(connection, row_id_qry)
+
+        if row_id_out is None:
+            return (0, 'Error - No journal batch row id found')
+        else:
+            row_id = row_id_out[0][0]
+            return (row_id_out, 'OK')
+    except Error:
+        print('*** ERROR ***')
+        return (99, '*** Error***')
