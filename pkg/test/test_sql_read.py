@@ -36,7 +36,9 @@ from .. database.sql_queries.queries_insert import (batch_load_je_file,
                                                     batch_load_insert,
                                                     )
 
-from . test_queries import query_initialize_000
+from . test_queries import (query_initialize_000,
+                            load_csv_to_journal,
+                            )
 
 import pandas as pd
 
@@ -44,8 +46,8 @@ import pandas as pd
 Current READ queries:
 
 x def select_all(table):
-x def select_batch_available(table):
-def select_batch_loaded(table):
+def select_batch_available(table):
+WIP def select_batch_loaded(table):
 def select_batch_by_row_id(table, journal_batch_row_id):
 def select_je_by_row_id(table, row_id):
 def select_rowcount_row_id(table, row_id):
@@ -99,12 +101,25 @@ def test_func_select_batch_available_not_ready():
     # assert(rows == test_value)
 
 
-def test_csv_load_process():
-    """Create a batch and then load a csv file into journal_loader and then
-    into journal. Check if it loads into journal_loader. If that passes check
-    if it loads into journal by comparing DR/CR totals from the journal table
-    versus the same csv file loaded into a pandas dataframe.
+# ******* Resume HERE *******
+# Need to add assert checks and any other intermediate steps
+# Currently able to post csv's to journal table and now need to confirm
+# that select_batch_loaded(table) is working as designed.
+
+def test_select_batch_loaded_not_ready():
+    """Check if select_batch_loaded function is gathering batches that have associated journal table rows. Need to also confirm that each batch has the appropriate gl_batch_status value.
     """
+
+    # Values to be used within scope of test_sql_csv_load.py
+    # test_filename = 'csv_out02.csv'
+    # test_journal_batch_name = 'pytest-test_csv_load101'
+    # test_journal_batch_description = 'csv_out02.csv'
+    # test_journal_batch_entity = 1
+    # test_journal_batch_currency = 1
+    # test_gl_post_reference = 'NULL'
+    # test_gl_batch_status = 0
+
+    # select_batch_loaded(table)
 
     # Initialize journal_batch, journal_loader and journal by deleting all
     # rows from each table
@@ -123,66 +138,38 @@ def test_csv_load_process():
     else:
         print(initialize_result[1])
 
-    # Create batch for testing
-    filename = test_filename
-    journal_batch_name = test_journal_batch_name
-    journal_batch_description = test_journal_batch_description
-    journal_batch_entity = test_journal_batch_entity
-    journal_batch_currency = test_journal_batch_currency
-    gl_post_reference = test_gl_post_reference
-    gl_batch_status = test_gl_batch_status
+    # Process batches and csv file data through journal load stage.
 
-    insert_new_batch_name(journal_batch_name,
-                          journal_batch_description,
-                          str(journal_batch_entity),
-                          str(journal_batch_currency),
-                          gl_post_reference,
-                          str(gl_batch_status),
-                          )
+    # List of batch name(s) to use
+    batch_names = ['check000',
+                   'check001',
+                   ]
 
-    # Set up csv file to use
-    print('=' * 80)
-    batch_row_id = get_journal_batch_row_id_by_name(journal_batch_name)
-    print(f'journal_batch_name: {journal_batch_name}')
-    print(f'batch_row_id: {batch_row_id}')
-    print(f'filename: {filename}')
-    batch_row_id = batch_row_id[0][0][0]
-    # batch_row_id = batch_row_id[0][0]  <<< use to test malformed query
-    print(f'batch_row_id: {batch_row_id}')
-    print('=' * 80)
+    batch_info_00 = dict()
+    batch_info_01 = dict()
 
-    # Load csv file to journal_loader
-    load_file = batch_load_je_file(filename, str(batch_row_id))
-    print('=' * 80)
+    # First batch attributes
+    batch_info_00['filename'] = 'csv_out00.csv'
+    batch_info_00['journal_batch_name'] = 'check000'
+    batch_info_00['journal_batch_description'] = 'csv_out00.csv'
+    batch_info_00['journal_batch_entity'] = 1
+    batch_info_00['journal_batch_currency'] = 1
+    batch_info_00['gl_post_reference'] = 'NULL'
+    batch_info_00['gl_batch_status'] = 0
 
-    print(f'load_file: {load_file}')
+    # Second batch attributes
+    batch_info_01['filename'] = 'csv_out01.csv'
+    batch_info_01['journal_batch_name'] = 'check001'
+    batch_info_01['journal_batch_description'] = 'csv_out01.csv'
+    batch_info_01['journal_batch_entity'] = 1
+    batch_info_01['journal_batch_currency'] = 1
+    batch_info_01['gl_post_reference'] = 'NULL'
+    batch_info_01['gl_batch_status'] = 0
 
-    print('=' * 80)
-    if load_file == 'LOAD OKAY':
-        status_ = 1
-    else:
-        status_ = 99
-    assert(status_ == 1)
-
-    # Compare csv totals loaded into pandas dataframe to journal
-    # table totals.
-
-    # Load batch in journal_loader to journal
-    load_status_journal = batch_load_insert(batch_row_id)
-    print('*' * 100)
-    print(f'load_status_journal: {load_status_journal}')
-    print('*' * 100)
-    df = pd.read_csv(working_data_folder + filename)
-    print(df.head())
-    print(f'batch_row_id: {batch_row_id}')
-
-    df_dr_total = df['journal_debit'].sum()
-    df_cr_total = df['journal_credit'].sum()
-
-    journal_txt, journal_DR_total, journal_CR_total = batch_total('journal', batch_row_id)
-
-    assert(df_dr_total == round(journal_DR_total, 2))
-    assert(df_cr_total == round(journal_CR_total, 2))
+    batch_info_00_out = load_csv_to_journal(batch_info_00)
+    batch_info_01_out = load_csv_to_journal(batch_info_01)
+    print(f'batch_info_00_out: {batch_info_00_out}')
+    print(f'batch_info_01_out: {batch_info_00_out}')
 
 
 if __name__ == '__main__':
@@ -238,13 +225,6 @@ if __name__ == '__main__':
     print(f'items in check_output: {len(check_output)}')
 
     print('*' * 60)
-
-    print('+' * 60)
-    print()
-    check_status = test_csv_load_process()
-    print(f'check_status: {check_status}')
-    print('+' * 60)
-    print()
 
     print('>' * 90)
     print()

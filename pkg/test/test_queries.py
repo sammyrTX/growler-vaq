@@ -62,6 +62,69 @@ def query_initialize_000(table_list):
     return [delete_status, f'Delete process completed ({_delete})']
 
 
+def load_csv_to_journal(batch_info):
+    """Take a dict of batch and csv info and load into journal table."""
+
+    # Create batch for testing
+    filename = batch_info['filename']
+    journal_batch_name = batch_info['journal_batch_name']
+    journal_batch_description = batch_info['journal_batch_description']
+    journal_batch_entity = batch_info['journal_batch_entity']
+    journal_batch_currency = batch_info['journal_batch_currency']
+    gl_post_reference = batch_info['gl_post_reference']
+    gl_batch_status = batch_info['gl_batch_status']
+
+    insert_new_batch_name(journal_batch_name,
+                          journal_batch_description,
+                          str(journal_batch_entity),
+                          str(journal_batch_currency),
+                          gl_post_reference,
+                          str(gl_batch_status),
+                          )
+
+    # Set up csv file to use
+    batch_row_id = get_journal_batch_row_id_by_name(journal_batch_name)
+    batch_row_id = batch_row_id[0][0][0]
+
+    # Load csv file to journal_loader
+    load_file = batch_load_je_file(filename, str(batch_row_id))
+
+    if load_file == 'LOAD OKAY':
+        status_ = 1
+    else:
+        status_ = 99
+        raise Exception('Error posting csv file to Journal table')
+
+    # Compare csv totals loaded into pandas dataframe to journal
+    # table totals.
+
+    # Load batch in journal_loader to journal
+    load_status_journal = batch_load_insert(batch_row_id)
+    return f'load_status_journal: {load_status_journal}'
+
+    # # Load csv file inro pandas dataframe
+    # df = pd.read_csv(working_data_folder + filename)
+    # print(df.head())
+    # print(f'batch_row_id: {batch_row_id}')
+
+    # # Get DR/CR totals in dataframe
+    # df_dr_total = df['journal_debit'].sum()
+    # df_cr_total = df['journal_credit'].sum()
+
+    # journal_txt, journal_DR_total, journal_CR_total = batch_total('journal', batch_row_id)
+    # print('-' * 100)
+    # print()
+
+    # print(f'journal_txt: {journal_txt}')
+    # print(f'journal_DR_total: {journal_DR_total}')
+    # print(f'journal_CR_total: {journal_CR_total}')
+
+    # print()
+    # print('-' * 100)
+    # assert(df_dr_total == round(journal_DR_total, 2))
+    # assert(df_cr_total == round(journal_CR_total, 2))
+
+
 if __name__ == '__main__':
 
     # Begin table initialization

@@ -41,6 +41,8 @@ from .. database.sql_queries.queries_insert import (batch_load_je_file,
                                                     batch_load_insert,
                                                     )
 
+from . test_queries import query_initialize_000
+
 import pandas as pd
 
 # Values to be used within scope of test_sql_csv_load.py
@@ -59,6 +61,23 @@ def test_csv_load_process():
     if it loads into journal by comparing DR/CR totals from the journal table
     versus the same csv file loaded into a pandas dataframe.
     """
+
+    # Initialize journal_batch, journal_loader and journal by deleting all
+    # rows from each table
+
+    table_list = ['journal_batch',
+                  'journal_loader',
+                  # 'journal_loaderX',
+                  'journal',
+                  ]
+
+    initialize_result = query_initialize_000(table_list)
+
+    if initialize_result[0] != 0:
+        print(initialize_result[1])
+        raise Exception('Table initialization error')
+    else:
+        print(initialize_result[1])
 
     # Create batch for testing
     filename = test_filename

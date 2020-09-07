@@ -14,6 +14,7 @@ from .. db_config import config
 import mysql.connector
 from mysql.connector import Error
 
+
 def select_all(table):
     """select all rows from a given table"""
     connection = create_connection(**config)
