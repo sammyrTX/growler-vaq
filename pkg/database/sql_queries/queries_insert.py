@@ -179,7 +179,7 @@ def update_batch_gl_status(batch_row_id, status):
 
         batch_status = "OK"
         print(f"*** journal batch gl status updated successfully ***")
-
+        connection.close()
         return (batch_status)
 
     except IndexError:
@@ -209,12 +209,15 @@ def batch_load_insert(batch_row_id):
         loader_to_journal_status = update_batch_gl_status(batch_row_id, 20)
 
         if loader_to_journal_status == 'OK':
-
-            load_status = "journal_loader to journal INSERT COMPLETE"
+            # Set to zero to indicate journal_loader to journal INSERT COMPLETE
+            load_status = 0
             print(f"*** INSERT COMPLETE ***")
+            connection.close()
         else:
-            load_status = 'ERROR with Loader to Journals table'
-
+            # Set to 99 to indicate and error with the load
+            load_status = 99
+            print(f'ERROR with Loader to Journals table')
+            connection.close()
         return load_status
 
     except IndexError:

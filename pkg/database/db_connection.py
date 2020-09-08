@@ -34,6 +34,7 @@ def execute_query(connection, query):
     try:
         cursor.execute(query)
         connection.commit()
+        cursor.close()
         return "Query executed successfully"
     except Error as e:
         return f'The error "{e}" occurred'

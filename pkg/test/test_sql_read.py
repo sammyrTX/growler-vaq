@@ -38,6 +38,7 @@ from .. database.sql_queries.queries_insert import (batch_load_je_file,
 
 from . test_queries import (query_initialize_000,
                             load_csv_to_journal,
+                            get_batch_row_id_in_journal,
                             )
 
 import pandas as pd
@@ -107,17 +108,8 @@ def test_func_select_batch_available_not_ready():
 # that select_batch_loaded(table) is working as designed.
 
 def test_select_batch_loaded_not_ready():
-    """Check if select_batch_loaded function is gathering batches that have associated journal table rows. Need to also confirm that each batch has the appropriate gl_batch_status value.
+    """Check if select_batch_loaded function is gathering batches that have associated journal table rows.
     """
-
-    # Values to be used within scope of test_sql_csv_load.py
-    # test_filename = 'csv_out02.csv'
-    # test_journal_batch_name = 'pytest-test_csv_load101'
-    # test_journal_batch_description = 'csv_out02.csv'
-    # test_journal_batch_entity = 1
-    # test_journal_batch_currency = 1
-    # test_gl_post_reference = 'NULL'
-    # test_gl_batch_status = 0
 
     # select_batch_loaded(table)
 
@@ -136,7 +128,7 @@ def test_select_batch_loaded_not_ready():
         print(initialize_result[1])
         raise Exception('Table initialization error')
     else:
-        print(initialize_result[1])
+        print(f'initialization: {initialize_result[1]}')
 
     # Process batches and csv file data through journal load stage.
 
@@ -149,27 +141,62 @@ def test_select_batch_loaded_not_ready():
     batch_info_01 = dict()
 
     # First batch attributes
-    batch_info_00['filename'] = 'csv_out00.csv'
-    batch_info_00['journal_batch_name'] = 'check000'
-    batch_info_00['journal_batch_description'] = 'csv_out00.csv'
+    batch_info_00['filename'] = 'je_load_kilo.csv'
+    batch_info_00['journal_batch_name'] = batch_names[0]
+    batch_info_00['journal_batch_description'] = 'je_load_kilo.csv'
     batch_info_00['journal_batch_entity'] = 1
     batch_info_00['journal_batch_currency'] = 1
     batch_info_00['gl_post_reference'] = 'NULL'
     batch_info_00['gl_batch_status'] = 0
 
     # Second batch attributes
-    batch_info_01['filename'] = 'csv_out01.csv'
-    batch_info_01['journal_batch_name'] = 'check001'
-    batch_info_01['journal_batch_description'] = 'csv_out01.csv'
+    batch_info_01['filename'] = 'je_load_juliet.csv'
+    batch_info_01['journal_batch_name'] = batch_names[1]
+    batch_info_01['journal_batch_description'] = 'je_load_juliet.csv'
     batch_info_01['journal_batch_entity'] = 1
     batch_info_01['journal_batch_currency'] = 1
     batch_info_01['gl_post_reference'] = 'NULL'
     batch_info_01['gl_batch_status'] = 0
 
+    # # Second batch attributes
+    # batch_info_01['filename'] = 'csv_out01.csv'
+    # batch_info_01['journal_batch_name'] = batch_names[1]
+    # batch_info_01['journal_batch_description'] = 'csv_out01.csv'
+    # batch_info_01['journal_batch_entity'] = 1
+    # batch_info_01['journal_batch_currency'] = 1
+    # batch_info_01['gl_post_reference'] = 'NULL'
+    # batch_info_01['gl_batch_status'] = 0
+
     batch_info_00_out = load_csv_to_journal(batch_info_00)
     batch_info_01_out = load_csv_to_journal(batch_info_01)
     print(f'batch_info_00_out: {batch_info_00_out}')
-    print(f'batch_info_01_out: {batch_info_00_out}')
+    print(f'batch_info_01_out: {batch_info_01_out}')
+
+    # Loaded batches that should be in journal table
+    batches_loaded = [batch_info_00_out[1],
+                      batch_info_01_out[1],
+                      ]
+
+    print(f'batches_loaded: {batches_loaded} <<<<<')
+
+    if batch_info_00_out[0] == 0 and batch_info_01_out[0] == 0:
+        #Check if batches have corresponding rows in the journal table
+        print(f'&&&&&&&&&&&&&&&&&&&&')
+        batch_row_id = batches_loaded[0]
+        print(f'batch_row_id ::: {batch_row_id}')
+
+        #**** PROBLEM IS HERE ****
+        batches_in_journal = get_batch_row_id_in_journal(batch_row_id)
+
+        print(f'{batches_in_journal}')
+        # for _ in batches_loaded:
+        # raise Exception('Halt...!')
+
+    else:
+        # Raise exception if the status from load_csv_to_journal is not
+        # zero for either batch.
+        raise Exception('Error in csv to journal load process')
+
 
 
 if __name__ == '__main__':

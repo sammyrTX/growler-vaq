@@ -45,7 +45,7 @@ def query_initialize_000(table_list):
     # Iterate through each table in the list and delete all rows
 
     connection = create_connection(**config)
-    delete_status = 0 # Default as zero for no error; 99 if there is an error.
+    delete_status = 0  # Default as zero for no error; 99 if there is an error.
 
     for _ in table_list:
         delete_all_rows = """DELETE FROM """ + _
@@ -58,7 +58,7 @@ def query_initialize_000(table_list):
             print(f'Delete failed: {_delete}')
             delete_status = 99
             break
-
+    connection.close()
     return [delete_status, f'Delete process completed ({_delete})']
 
 
@@ -89,40 +89,56 @@ def load_csv_to_journal(batch_info):
     # Load csv file to journal_loader
     load_file = batch_load_je_file(filename, str(batch_row_id))
 
+    status_ = [0, batch_row_id]  # [load_file status, batch_row_id]
+
     if load_file == 'LOAD OKAY':
-        status_ = 1
+        status_[0] = 0
     else:
-        status_ = 99
+        status_[0] = 99
         raise Exception('Error posting csv file to Journal table')
 
     # Compare csv totals loaded into pandas dataframe to journal
     # table totals.
 
     # Load batch in journal_loader to journal
-    load_status_journal = batch_load_insert(batch_row_id)
-    return f'load_status_journal: {load_status_journal}'
+    if status_[0] == 0:
+        load_status_journal = batch_load_insert(batch_row_id)
+        print(f'load_status_journal: {load_status_journal}')
+        return status_
+    else:
+        print(f'Error loading to journal_loader: {status_}')
+        raise Exception('Error posting csv file to journal_loader')
+        return status_
 
-    # # Load csv file inro pandas dataframe
-    # df = pd.read_csv(working_data_folder + filename)
-    # print(df.head())
-    # print(f'batch_row_id: {batch_row_id}')
 
-    # # Get DR/CR totals in dataframe
-    # df_dr_total = df['journal_debit'].sum()
-    # df_cr_total = df['journal_credit'].sum()
+def get_batch_row_id_in_journal(batch_row_id):
+    """Get journal_batch_row_id's and associated DR/CR totals"""
+    print(f'batch_row_id arg: {batch_row_id}')
 
-    # journal_txt, journal_DR_total, journal_CR_total = batch_total('journal', batch_row_id)
-    # print('-' * 100)
-    # print()
 
-    # print(f'journal_txt: {journal_txt}')
-    # print(f'journal_DR_total: {journal_DR_total}')
-    # print(f'journal_CR_total: {journal_CR_total}')
+    # print(f'check connection: {connection.is_connected()}')
+    # connection.close()
+    # raise Error('*** HALT ***')
 
-    # print()
-    # print('-' * 100)
-    # assert(df_dr_total == round(journal_DR_total, 2))
-    # assert(df_cr_total == round(journal_CR_total, 2))
+    # return f"Done, here is the arg: {batch_row_id}"
+
+    try:
+        connection = create_connection(**config)
+        batches_in_journal = """SELECT journal_batch_row_id, sum(journal_debit) as total_dr, sum(journal_credit) as total_cr FROM journal GROUP BY journal_batch_row_id"""
+
+        print(f'batches_in_journal: {batches_in_journal}')
+
+        # ***** Issue is here ******
+
+        xxx = execute_query(connection, batches_in_journal)
+        print(f'batches: {xxx}')
+        connection.commit()
+        connection.close()
+        return xxx
+    except Error as e:
+        print(f"The error '{e}' occurred")
+        connection.close()
+        return e
 
 
 if __name__ == '__main__':

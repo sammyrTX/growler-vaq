@@ -123,8 +123,7 @@ def journal_loader_to_journal(batch_row_id):
 
     load_status = batch_load_insert(batch_row_id)
 
-    if load_status == "journal_loader to journal INSERT COMPLETE":
-
+    if load_status == 0:
         return redirect(url_for('accounting_app_journals_bp.journal_loader_batch_review', batch_row_id=batch_row_id))
     else:
         return render_template('journals/journal_batch_load_error.html')
