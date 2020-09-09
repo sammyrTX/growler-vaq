@@ -115,26 +115,15 @@ def get_batch_row_id_in_journal(batch_row_id):
     """Get journal_batch_row_id's and associated DR/CR totals"""
     print(f'batch_row_id arg: {batch_row_id}')
 
-
-    # print(f'check connection: {connection.is_connected()}')
-    # connection.close()
-    # raise Error('*** HALT ***')
-
-    # return f"Done, here is the arg: {batch_row_id}"
-
     try:
         connection = create_connection(**config)
         batches_in_journal = """SELECT journal_batch_row_id, sum(journal_debit) as total_dr, sum(journal_credit) as total_cr FROM journal GROUP BY journal_batch_row_id"""
-
         print(f'batches_in_journal: {batches_in_journal}')
 
-        # ***** Issue is here ******
-
-        xxx = execute_query(connection, batches_in_journal)
-        print(f'batches: {xxx}')
-        connection.commit()
+        batches_loaded = execute_read_query(connection, batches_in_journal)
+        print(f'batches: {batches_loaded}')
         connection.close()
-        return xxx
+        return batches_loaded
     except Error as e:
         print(f"The error '{e}' occurred")
         connection.close()

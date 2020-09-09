@@ -185,12 +185,10 @@ def test_select_batch_loaded_not_ready():
         batch_row_id = batches_loaded[0]
         print(f'batch_row_id ::: {batch_row_id}')
 
-        #**** PROBLEM IS HERE ****
         batches_in_journal = get_batch_row_id_in_journal(batch_row_id)
 
+        print('batches_in_journal OUT:')
         print(f'{batches_in_journal}')
-        # for _ in batches_loaded:
-        # raise Exception('Halt...!')
 
     else:
         # Raise exception if the status from load_csv_to_journal is not
