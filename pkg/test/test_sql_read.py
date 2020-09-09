@@ -107,18 +107,15 @@ def test_func_select_batch_available_not_ready():
 # Currently able to post csv's to journal table and now need to confirm
 # that select_batch_loaded(table) is working as designed.
 
-def test_select_batch_loaded_not_ready():
+def test_select_batch_loaded():
     """Check if select_batch_loaded function is gathering batches that have associated journal table rows.
     """
-
-    # select_batch_loaded(table)
 
     # Initialize journal_batch, journal_loader and journal by deleting all
     # rows from each table
 
     table_list = ['journal_batch',
                   'journal_loader',
-                  # 'journal_loaderX',
                   'journal',
                   ]
 
@@ -137,58 +134,87 @@ def test_select_batch_loaded_not_ready():
                    'check001',
                    ]
 
-    batch_info_00 = dict()
-    batch_info_01 = dict()
+    csv_files = ['je_load_kilo.csv',
+                 'je_load_kilo.csv',
+                 ]
 
-    # First batch attributes
-    batch_info_00['filename'] = 'je_load_kilo.csv'
-    batch_info_00['journal_batch_name'] = batch_names[0]
-    batch_info_00['journal_batch_description'] = 'je_load_kilo.csv'
-    batch_info_00['journal_batch_entity'] = 1
-    batch_info_00['journal_batch_currency'] = 1
-    batch_info_00['gl_post_reference'] = 'NULL'
-    batch_info_00['gl_batch_status'] = 0
+    batches_loaded = list()
 
-    # Second batch attributes
-    batch_info_01['filename'] = 'je_load_juliet.csv'
-    batch_info_01['journal_batch_name'] = batch_names[1]
-    batch_info_01['journal_batch_description'] = 'je_load_juliet.csv'
-    batch_info_01['journal_batch_entity'] = 1
-    batch_info_01['journal_batch_currency'] = 1
-    batch_info_01['gl_post_reference'] = 'NULL'
-    batch_info_01['gl_batch_status'] = 0
+    for idx, _ in enumerate(batch_names):
+        batch_info = dict()
+
+        batch_info['filename'] = _
+        batch_info['journal_batch_name'] = _
+        batch_info['journal_batch_description'] = csv_files[idx]
+        batch_info['journal_batch_entity'] = 1
+        batch_info['journal_batch_currency'] = 1
+        batch_info['gl_post_reference'] = 'NULL'
+        batch_info['gl_batch_status'] = 0
+
+        batch_info_out = load_csv_to_journal(batch_info)
+        print(f'batch_info_out: {batch_info_out}')
+        batches_loaded.append(batch_info_out)
+
+    print('csv loading complete')
+    # batch_info_00 = dict()
+    # batch_info_01 = dict()
+
+    # # First batch attributes
+    # batch_info_00['filename'] = 'je_load_kilo.csv'
+    # batch_info_00['journal_batch_name'] = batch_names[0]
+    # batch_info_00['journal_batch_description'] = 'je_load_kilo.csv'
+    # batch_info_00['journal_batch_entity'] = 1
+    # batch_info_00['journal_batch_currency'] = 1
+    # batch_info_00['gl_post_reference'] = 'NULL'
+    # batch_info_00['gl_batch_status'] = 0
 
     # # Second batch attributes
-    # batch_info_01['filename'] = 'csv_out01.csv'
+    # batch_info_01['filename'] = 'je_load_juliet.csv'
     # batch_info_01['journal_batch_name'] = batch_names[1]
-    # batch_info_01['journal_batch_description'] = 'csv_out01.csv'
+    # batch_info_01['journal_batch_description'] = 'je_load_juliet.csv'
     # batch_info_01['journal_batch_entity'] = 1
     # batch_info_01['journal_batch_currency'] = 1
     # batch_info_01['gl_post_reference'] = 'NULL'
     # batch_info_01['gl_batch_status'] = 0
 
-    batch_info_00_out = load_csv_to_journal(batch_info_00)
-    batch_info_01_out = load_csv_to_journal(batch_info_01)
-    print(f'batch_info_00_out: {batch_info_00_out}')
-    print(f'batch_info_01_out: {batch_info_01_out}')
+    # batch_info_00_out = load_csv_to_journal(batch_info_00)
+    # batch_info_01_out = load_csv_to_journal(batch_info_01)
+    # print(f'batch_info_00_out: {batch_info_00_out}')
+    # print(f'batch_info_01_out: {batch_info_01_out}')
 
-    # Loaded batches that should be in journal table
-    batches_loaded = [batch_info_00_out[1],
-                      batch_info_01_out[1],
-                      ]
+    # # Loaded batches that should be in journal table
+    # batches_loaded = [batch_info_00_out[1],
+    #                   batch_info_01_out[1],
+    #                   ]
 
     print(f'batches_loaded: {batches_loaded} <<<<<')
 
-    if batch_info_00_out[0] == 0 and batch_info_01_out[0] == 0:
+    # Confirm each csv loaded is okay
+
+    batches_loaded_status = 0
+
+    for _ in batches_loaded:
+        if _[0] == 0:
+            batches_loaded_status = 0
+        else:
+            batches_loaded_status = 99
+
+    #   **** RESUME HERE *****
+    #   Check for batch_row_ids from batches_loaded list
+
+    if batches_loaded_status == 0:
         #Check if batches have corresponding rows in the journal table
-        print(f'&&&&&&&&&&&&&&&&&&&&')
+
         batch_row_id = batches_loaded[0]
         print(f'batch_row_id ::: {batch_row_id}')
 
         batches_in_journal = get_batch_row_id_in_journal(batch_row_id)
+        batches_in_journal_check = [batches_in_journal[0][0], batches_in_journal[1][0]]
 
         print('batches_in_journal OUT:')
         print(f'{batches_in_journal}')
+
+        assert(batches_loaded == batches_in_journal_check)
 
     else:
         # Raise exception if the status from load_csv_to_journal is not
