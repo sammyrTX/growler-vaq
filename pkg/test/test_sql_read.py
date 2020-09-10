@@ -46,9 +46,10 @@ import pandas as pd
 """
 Current READ queries:
 
-x def select_all(table):
-def select_batch_available(table):
-WIP def select_batch_loaded(table):
+*** def select_all(table):
+*** def select_batch_loaded(table):
+*** def select_batch_available(table):
+
 def select_batch_by_row_id(table, journal_batch_row_id):
 def select_je_by_row_id(table, row_id):
 def select_rowcount_row_id(table, row_id):
@@ -78,7 +79,7 @@ def test_value():
     assert(value == value_to_test)
 
 
-def test_func_select_all():
+def test_select_all():
     """Check row count from select_all function"""
 
     table = 'z_test_table_00'
@@ -91,21 +92,59 @@ def test_func_select_all():
     assert(rows[0] == test_row_0)
 
 
-def test_func_select_batch_available_not_ready():
-    pass
+def test_select_batch_available():
     """Check batches that should be available. gl_batch_status should
        not equal 20."""
-    # table = 'z_test_journal_batch'
-    # test_value = [(33, 'test-01', '888', 1, 0, 'NEED GL POST REF', 10), (32, 'test-00', 'lll', 1, 0, 'NEED GL POST REF', 10)]
-    # rows = select_batch_available(table)
 
-    # assert(rows == test_value)
+    # Clear journal_batch table
+    table_list = ['journal_batch']
+    delete_status = query_initialize_000(table_list)
+    if delete_status[0] == 0:
+        print('table initialization completed successfully')
+    else:
+        raise Exception(f'initialization of {table_list} failed')
 
+    # Create test batches
+    test_batch_name = [['batch000', 20],
+                       ['batch001', 20],
+                       ['batch002', 0],
+                       ['batch003', 20],
+                       ['batch004', 0],
+                       ['batch005', 99],
+                       ]
 
-# ******* Resume HERE *******
-# Need to add assert checks and any other intermediate steps
-# Currently able to post csv's to journal table and now need to confirm
-# that select_batch_loaded(table) is working as designed.
+    batch_info = dict()
+
+    for _ in test_batch_name:
+        batch_info['journal_batch_name'] = _[0]
+        batch_info['journal_batch_description'] = _[0] + ' - No csv file'
+        batch_info['journal_batch_entity'] = '1'
+        batch_info['journal_batch_currency'] = '1'
+        batch_info['gl_post_reference'] = 'NULL'
+        batch_info['gl_batch_status'] = str(_[1])
+
+        insert_new_batch_name(**batch_info)
+
+    # Put batch row id's that are not a status of 20 in a list
+    test_batch_avail = list()
+
+    for _ in test_batch_name:
+        if _[1] != 20:
+            row_ = get_journal_batch_row_id_by_name(_[0])
+            test_batch_avail.append(row_[0][0][0])
+
+    # Execute select_batch_available; put batch row id's in a list
+    table = 'journal_batch'
+    available_batches = select_batch_available(table)
+
+    available_batches_row_ids = list()
+
+    for _ in available_batches:
+        available_batches_row_ids.append(_[0])
+
+    # Test result set
+    assert(test_batch_avail.sort() == available_batches_row_ids.sort())
+
 
 def test_select_batch_loaded():
     """Check if select_batch_loaded function is gathering batches that have associated journal table rows.
@@ -143,7 +182,7 @@ def test_select_batch_loaded():
     for idx, _ in enumerate(batch_names):
         batch_info = dict()
 
-        batch_info['filename'] = _
+        batch_info['filename'] = csv_files[idx]
         batch_info['journal_batch_name'] = _
         batch_info['journal_batch_description'] = csv_files[idx]
         batch_info['journal_batch_entity'] = 1
@@ -155,52 +194,17 @@ def test_select_batch_loaded():
         print(f'batch_info_out: {batch_info_out}')
         batches_loaded.append(batch_info_out)
 
-    print('csv loading complete')
-    # batch_info_00 = dict()
-    # batch_info_01 = dict()
-
-    # # First batch attributes
-    # batch_info_00['filename'] = 'je_load_kilo.csv'
-    # batch_info_00['journal_batch_name'] = batch_names[0]
-    # batch_info_00['journal_batch_description'] = 'je_load_kilo.csv'
-    # batch_info_00['journal_batch_entity'] = 1
-    # batch_info_00['journal_batch_currency'] = 1
-    # batch_info_00['gl_post_reference'] = 'NULL'
-    # batch_info_00['gl_batch_status'] = 0
-
-    # # Second batch attributes
-    # batch_info_01['filename'] = 'je_load_juliet.csv'
-    # batch_info_01['journal_batch_name'] = batch_names[1]
-    # batch_info_01['journal_batch_description'] = 'je_load_juliet.csv'
-    # batch_info_01['journal_batch_entity'] = 1
-    # batch_info_01['journal_batch_currency'] = 1
-    # batch_info_01['gl_post_reference'] = 'NULL'
-    # batch_info_01['gl_batch_status'] = 0
-
-    # batch_info_00_out = load_csv_to_journal(batch_info_00)
-    # batch_info_01_out = load_csv_to_journal(batch_info_01)
-    # print(f'batch_info_00_out: {batch_info_00_out}')
-    # print(f'batch_info_01_out: {batch_info_01_out}')
-
-    # # Loaded batches that should be in journal table
-    # batches_loaded = [batch_info_00_out[1],
-    #                   batch_info_01_out[1],
-    #                   ]
-
-    print(f'batches_loaded: {batches_loaded} <<<<<')
-
     # Confirm each csv loaded is okay
 
     batches_loaded_status = 0
+    batches_loaded_check = list()
 
     for _ in batches_loaded:
         if _[0] == 0:
             batches_loaded_status = 0
+            batches_loaded_check.append(_[1])
         else:
             batches_loaded_status = 99
-
-    #   **** RESUME HERE *****
-    #   Check for batch_row_ids from batches_loaded list
 
     if batches_loaded_status == 0:
         #Check if batches have corresponding rows in the journal table
@@ -211,16 +215,12 @@ def test_select_batch_loaded():
         batches_in_journal = get_batch_row_id_in_journal(batch_row_id)
         batches_in_journal_check = [batches_in_journal[0][0], batches_in_journal[1][0]]
 
-        print('batches_in_journal OUT:')
-        print(f'{batches_in_journal}')
-
-        assert(batches_loaded == batches_in_journal_check)
+        assert(batches_loaded_check == batches_in_journal_check)
 
     else:
         # Raise exception if the status from load_csv_to_journal is not
         # zero for either batch.
         raise Exception('Error in csv to journal load process')
-
 
 
 if __name__ == '__main__':

@@ -46,7 +46,6 @@ def query_initialize_000(table_list):
 
     connection = create_connection(**config)
     delete_status = 0  # Default as zero for no error; 99 if there is an error.
-
     for _ in table_list:
         delete_all_rows = """DELETE FROM """ + _
         _delete = execute_query(connection, delete_all_rows)
@@ -58,6 +57,7 @@ def query_initialize_000(table_list):
             print(f'Delete failed: {_delete}')
             delete_status = 99
             break
+
     connection.close()
     return [delete_status, f'Delete process completed ({_delete})']
 
