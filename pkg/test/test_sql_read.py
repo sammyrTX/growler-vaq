@@ -39,6 +39,7 @@ from .. database.sql_queries.queries_insert import (batch_load_je_file,
 from . test_queries import (query_initialize_000,
                             load_csv_to_journal,
                             get_batch_row_id_in_journal,
+                            test_sample_batches,
                             )
 
 import pandas as pd
@@ -49,8 +50,8 @@ Current READ queries:
 *** def select_all(table):
 *** def select_batch_loaded(table):
 *** def select_batch_available(table):
+*** def select_batch_by_row_id(table, journal_batch_row_id):
 
-def select_batch_by_row_id(table, journal_batch_row_id):
 def select_je_by_row_id(table, row_id):
 def select_rowcount_row_id(table, row_id):
 def select_batch_id(table, journal_batch_row_id):
@@ -221,6 +222,48 @@ def test_select_batch_loaded():
         # Raise exception if the status from load_csv_to_journal is not
         # zero for either batch.
         raise Exception('Error in csv to journal load process')
+
+
+def test_select_batch_by_row_id():
+    # Initialize journal_batch table before inserting sample rows
+    table_list = ['journal_batch']
+    delete_status = query_initialize_000(table_list)
+    if delete_status[0] != 0:
+        raise Error('Table initialization failed at test_select_batch_by_row_id()')
+
+    # Load journal_batch with sample data dictionary from test_queries
+    for _ in test_sample_batches:
+        insert_new_batch_name(**_)
+
+    # Use an arbitrary batch name from the sample batches loaded to get the
+    # batch row id.
+
+    journal_batch_name = test_sample_batches[3]['journal_batch_name']
+
+    batch_row_id = get_journal_batch_row_id_by_name(journal_batch_name)
+
+    if batch_row_id[1] != 'OK':
+        raise Error('*** ERROR: test_select_batch_by_row_id not finding name')
+
+    # Put contents of test sample batch from dict into a list for later assert
+    test_sample_batch_to_check = list()
+    test_sample_batch_to_check.append(batch_row_id[0][0][0])
+
+    for key in test_sample_batches[3]:
+        test_sample_batch_to_check.append(test_sample_batches[3][key])
+
+    # Convert entity, currency & batch status to int
+    test_sample_batch_to_check[3] = int(test_sample_batch_to_check[3])
+    test_sample_batch_to_check[4] = int(test_sample_batch_to_check[4])
+    test_sample_batch_to_check[6] = int(test_sample_batch_to_check[6])
+
+    # Call select_batch_by_row_id and store result set
+    table = 'journal_batch'
+    journal_batch_row_id = batch_row_id[0][0][0]
+    function_result = select_batch_by_row_id(table, journal_batch_row_id)
+
+    # Compare sample data to function result set
+    assert(test_sample_batch_to_check == list(function_result[0]))
 
 
 if __name__ == '__main__':

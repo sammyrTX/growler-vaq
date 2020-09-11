@@ -52,15 +52,17 @@ def select_batch_loaded(table):
 
 
 def select_batch_by_row_id(table, journal_batch_row_id):
-    """Select row(s) from a table for a specific batch joining
-    on journal_batch_row_id."""
+    """Select row(s) from a table for a specific batch based
+    on journal_batch_row_id.
+    """
 
     connection = create_connection(**config)
 
-    print('******* in select_batch_by_id function **********')
+    print('******* in select_batch_by_row_id function **********')
 
     select_batch = """SELECT * FROM """ + table + """ WHERE journal_batch_row_id = """ + str(journal_batch_row_id) + """;"""
 
+    print(f'select_batch: {select_batch}')
     return execute_read_query(connection, select_batch)
 
 
