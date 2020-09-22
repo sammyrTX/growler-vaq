@@ -51,8 +51,8 @@ Current READ queries:
 *** def select_batch_loaded(table):
 *** def select_batch_available(table):
 *** def select_batch_by_row_id(table, journal_batch_row_id):
+*** def select_je_by_row_id(table, row_id): (*deleted, not being used*)
 
-def select_je_by_row_id(table, row_id):
 def select_rowcount_row_id(table, row_id):
 def select_batch_id(table, journal_batch_row_id):
 def batch_total(table, batch_row_id):
@@ -264,6 +264,18 @@ def test_select_batch_by_row_id():
 
     # Compare sample data to function result set
     assert(test_sample_batch_to_check == list(function_result[0]))
+
+
+def test_select_rowcount_row_id():
+    pass
+    # populate test table with data
+
+    # call select_rowcount_row_id function
+
+    # Compare sample data to function result set
+    assert(test_sample_batch_to_check == list(function_result[0]))
+
+    # >>> select_rowcount_row_id(table, row_id)
 
 
 if __name__ == '__main__':
