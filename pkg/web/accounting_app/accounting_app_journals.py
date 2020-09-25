@@ -148,9 +148,10 @@ def journal_loader_batch_review(batch_row_id):
     batch_name = journal_batch_row[0][1]
 
     # Check if the gl_batch_status is zero which indicates it is new with no
-    # data loaded or if the row count is zero
+    # data loaded or if there are no corresponding rows in journal_loader
+    # table indicating no csv file has been loaded to the staging table.
 
-    if journal_batch_row[0][6] == 0 or select_rowcount_row_id(journal_batch_table, batch_row_id) == 0:
+    if journal_batch_row[0][6] == 0 or select_rowcount_row_id(journal_loader_table, batch_row_id) == 0:
 
         # Set to a 'no rows' status
         je_source = 'New batch'

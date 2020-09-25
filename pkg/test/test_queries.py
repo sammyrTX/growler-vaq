@@ -105,6 +105,45 @@ test_sample_batches = [{'journal_batch_name': 'test_batch_000',
                         },
                        ]
 
+test_sample_batch00 = [{'journal_batch_name': 'test_batch_100',
+                        'journal_batch_description': 'test_batch_000_d',
+                        'journal_batch_entity': '1',
+                        'journal_batch_currency': '1',
+                        'gl_post_reference': 'NULL',
+                        'gl_batch_status': '0',
+                        },
+                       {'journal_batch_name': 'test_batch_101',
+                        'journal_batch_description': 'test_batch_001_d',
+                        'journal_batch_entity': '1',
+                        'journal_batch_currency': '1',
+                        'gl_post_reference': 'NULL',
+                        'gl_batch_status': '0',
+                        },
+                       {'journal_batch_name': 'test_batch_102',
+                        'journal_batch_description': 'test_batch_002_d',
+                        'journal_batch_entity': '1',
+                        'journal_batch_currency': '1',
+                        'gl_post_reference': 'NULL',
+                        'gl_batch_status': '0',
+                        },
+                       ]
+
+test_sample_batch01 = [{'journal_date': 'test_batch_000',
+                        'account_number': '1',
+                        'department_number': '1',
+                        'journal_entry_type': 'NULL',
+                        'journal_debit': '0',
+                        'journal_credit': 'test_batch_000_d',
+                        'journal_description': 'test_batch_000_d',
+                        'journal_reference': 'test_batch_000_d',
+                        'journal_batch_row_id': 'test_batch_000_d',
+                        'gl_post_reference': 'test_batch_000_d',
+                        'journal_entity': 'test_batch_000_d',
+                        'journal_currency': 'test_batch_000_d',
+                        },
+
+                       ]
+
 
 def query_initialize_000(table_list):
     """Delete all rows in each table that is passed in the list argument"""

@@ -40,6 +40,8 @@ from . test_queries import (query_initialize_000,
                             load_csv_to_journal,
                             get_batch_row_id_in_journal,
                             test_sample_batches,
+                            test_sample_batch00,
+                            test_sample_batch01,
                             )
 
 import pandas as pd
@@ -268,7 +270,30 @@ def test_select_batch_by_row_id():
 
 def test_select_rowcount_row_id():
     pass
-    # populate test table with data
+
+    # Initialize tables to test before inserting sample rows
+    table_list = ['journal_loader',
+                  'journal_batch',
+                  'journal',
+                  ]
+
+    delete_status = query_initialize_000(table_list)
+    if delete_status[0] != 0:
+        raise Error('Table initialization failed at test_select_batch_by_row_id()')
+
+    # Populate test tables with data
+    # Load journal_batch with sample data dictionary from test_queries
+    for _ in test_sample_batch00:
+        insert_new_batch_name(**_)
+
+    # Get the batch row id for "test_batch_100"
+    journal_batch_name = 'test_batch_100'
+    test_batch_row = get_journal_batch_row_id_by_name(journal_batch_name)
+    test_journal_batch_row_id = test_batch_row[0]
+
+    # Load journal_loader with sample data dictionary from test_queries
+    for _ in test_sample_batch01:
+        insert_new_batch_name(**_)
 
     # call select_rowcount_row_id function
 
