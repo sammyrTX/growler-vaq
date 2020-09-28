@@ -92,6 +92,44 @@ def insert_new_je_transaction(journal_name,
     return execute_query(connection, add_new_je)
 
 
+def insert_je_row(table,
+                  journal_date,
+                  account_number,
+                  department_number,
+                  journal_entry_type,
+                  journal_debit,
+                  journal_credit,
+                  journal_description,
+                  journal_reference,
+                  journal_batch_row_id,
+                  gl_post_reference,
+                  journal_entity,
+                  journal_currency,
+                  ):
+    # Insert a row of journal entry data into the table passed to the function
+    try:
+        connection = create_connection(**config)
+        insert_into_table = """INSERT INTO """ + table + """(journal_date, account_number, department_number, journal_entry_type, journal_debit, journal_credit, journal_description, journal_reference, journal_batch_row_id, gl_post_reference, journal_entity, journal_currency) VALUES ('""" + journal_date + """', """ + str(account_number) + """, """ + str(department_number) + """, """ + str(journal_entry_type) + """, """ + str(journal_debit) + """, """ + str(journal_credit) + """, '""" + journal_description + """', '""" + journal_reference + """', '""" + str(journal_batch_row_id) + """', '""" + gl_post_reference + """', """ + str(journal_entity) + """, """ + str(journal_currency) + """);"""
+
+        load_status = execute_query(connection, insert_into_table)
+
+        if load_status == 'Query executed successfully':
+            # Set to zero to indicate load was successful
+            load_status = 0
+            print(f"*** INSERT COMPLETE ***")
+        else:
+            # Set to 99 to indicate load error
+            load_status = 99
+            print(f'ERROR with Loader to Journals table')
+
+        connection.close()
+        return load_status
+
+    except IndexError:
+        print("IndexError!")
+        return "INDEX ERROR"
+
+
 def batch_load_je_file(filename, batch_row_id):
 
     """Load csv file provided into staging journal entries table (journal_loader) and validate before inserting into journals table

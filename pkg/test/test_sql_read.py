@@ -34,6 +34,7 @@ from .. database.sql_queries.queries_read import (select_all,
 from .. database.sql_queries.queries_insert import (batch_load_je_file,
                                                     insert_new_batch_name,
                                                     batch_load_insert,
+                                                    insert_je_row,
                                                     )
 
 from . test_queries import (query_initialize_000,
@@ -270,6 +271,8 @@ def test_select_batch_by_row_id():
 
 def test_select_rowcount_row_id():
     pass
+    # row count from test_queries.test_sample_batch01
+    test_sample_batch_to_check = 3
 
     # Initialize tables to test before inserting sample rows
     table_list = ['journal_loader',
@@ -292,13 +295,21 @@ def test_select_rowcount_row_id():
     test_journal_batch_row_id = test_batch_row[0]
 
     # Load journal_loader with sample data dictionary from test_queries
+    # *** Need to pass the journal_batch_row_id from sample batch created
+
+    table = 'journal_loader'
+    row_id = test_journal_batch_row_id
     for _ in test_sample_batch01:
-        insert_new_batch_name(**_)
+        load_status = insert_je_row(table, **_)
+        if load_status != 0:
+            print('*** ERROR at test_select_rowcount_row_id() ***')
+            break
 
     # call select_rowcount_row_id function
+    function_result = select_rowcount_row_id(table, row_id)
 
     # Compare sample data to function result set
-    assert(test_sample_batch_to_check == list(function_result[0]))
+    assert(test_sample_batch_to_check == function_result)
 
     # >>> select_rowcount_row_id(table, row_id)
 
