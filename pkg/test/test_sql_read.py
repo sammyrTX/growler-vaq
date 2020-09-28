@@ -21,7 +21,7 @@ from .. database.sql_queries.queries_read import (select_all,
                                                   select_batch_available,
                                                   select_batch_loaded,
                                                   select_batch_by_row_id,
-                                                  select_je_by_row_id,
+                                                  # select_je_by_row_id,
                                                   select_rowcount_row_id,
                                                   select_batch_id,
                                                   batch_total,
@@ -300,6 +300,7 @@ def test_select_rowcount_row_id():
     table = 'journal_loader'
     row_id = test_journal_batch_row_id
     for _ in test_sample_batch01:
+        _['journal_batch_row_id'] = row_id
         load_status = insert_je_row(table, **_)
         if load_status != 0:
             print('*** ERROR at test_select_rowcount_row_id() ***')
