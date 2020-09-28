@@ -292,7 +292,10 @@ def test_select_rowcount_row_id():
     # Get the batch row id for "test_batch_100"
     journal_batch_name = 'test_batch_100'
     test_batch_row = get_journal_batch_row_id_by_name(journal_batch_name)
-    test_journal_batch_row_id = test_batch_row[0]
+    print(f'test_batch_row: {test_batch_row}')
+    print(f'test_batch_row[0][0]: {test_batch_row[0][0]}')
+    print(f'test_batch_row[0][0][0]: {test_batch_row[0][0][0]}')
+    test_journal_batch_row_id = test_batch_row[0][0][0]
 
     # Load journal_loader with sample data dictionary from test_queries
     # *** Need to pass the journal_batch_row_id from sample batch created
@@ -308,6 +311,7 @@ def test_select_rowcount_row_id():
 
     # call select_rowcount_row_id function
     function_result = select_rowcount_row_id(table, row_id)
+    # function_result = 50  # foorccec a  faai
 
     # Compare sample data to function result set
     assert(test_sample_batch_to_check == function_result)
