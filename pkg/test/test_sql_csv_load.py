@@ -141,8 +141,8 @@ def test_csv_load_process():
 
     print()
     print('-' * 100)
-    assert(df_dr_total == round(journal_DR_total, 2))
-    assert(df_cr_total == round(journal_CR_total, 2))
+    assert(round(df_dr_total, 2) == round(journal_DR_total, 2))
+    assert(round(df_cr_total, 2) == round(journal_CR_total, 2))
 
     if __name__ == '__main__':
 
