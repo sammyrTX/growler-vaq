@@ -60,8 +60,8 @@ Current READ queries:
 *** def select_rowcount_row_id(table, row_id):
 *** def select_batch_id(table, journal_batch_row_id): (*deleted, not being
     used*)
+*** def batch_total(table, batch_row_id):
 
-def batch_total(table, batch_row_id):
 def select_entity_name_by_id(table, journal_batch_entity):
 def select_entity_list():
 def get_gl_batch_status(journal_batch_row_id):
