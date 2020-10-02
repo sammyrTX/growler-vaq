@@ -89,20 +89,9 @@ def select_rowcount_row_id(table, row_id):
     return row_count_result[0][0]
 
 
-def select_batch_id(table, journal_batch_row_id):
-    """**** REVIEW  - May not need this function **** Get the batch_id from a journal table. One use is to obtain
-    the batch id for transactions loaded into the journals_loader table."""
-
-    connection = create_connection(**config)
-
-    select_batch_id = """SELECT journal_batch_id FROM """ + table + """ GROUP BY journal_batch_id;"""
-
-    return execute_read_query(connection, select_batch_id)
-
-
 def batch_total(table, batch_row_id):
 
-    """For a given batch, total the debits and credits
+    """For a given batch row id and table, total the debits and credits.
     """
 
     connection = create_connection(**config)

@@ -23,12 +23,13 @@ from .. database.sql_queries.queries_read import (select_all,
                                                   select_batch_by_row_id,
                                                   # select_je_by_row_id,
                                                   select_rowcount_row_id,
-                                                  select_batch_id,
+                                                  # select_batch_id,
                                                   batch_total,
                                                   select_entity_name_by_id,
                                                   select_entity_list,
                                                   get_gl_batch_status,
                                                   get_journal_batch_row_id_by_name,
+                                                  batch_total,
                                                   )
 
 from .. database.sql_queries.queries_insert import (batch_load_je_file,
@@ -43,6 +44,7 @@ from . test_queries import (query_initialize_000,
                             test_sample_batches,
                             test_sample_batch00,
                             test_sample_batch01,
+                            test_sample_batch10,
                             )
 
 import pandas as pd
@@ -55,9 +57,10 @@ Current READ queries:
 *** def select_batch_available(table):
 *** def select_batch_by_row_id(table, journal_batch_row_id):
 *** def select_je_by_row_id(table, row_id): (*deleted, not being used*)
+*** def select_rowcount_row_id(table, row_id):
+*** def select_batch_id(table, journal_batch_row_id): (*deleted, not being
+    used*)
 
-def select_rowcount_row_id(table, row_id):
-def select_batch_id(table, journal_batch_row_id):
 def batch_total(table, batch_row_id):
 def select_entity_name_by_id(table, journal_batch_entity):
 def select_entity_list():
@@ -270,7 +273,6 @@ def test_select_batch_by_row_id():
 
 
 def test_select_rowcount_row_id():
-    pass
     # row count from test_queries.test_sample_batch01
     test_sample_batch_to_check = 3
 
@@ -311,18 +313,77 @@ def test_select_rowcount_row_id():
 
     # call select_rowcount_row_id function
     function_result = select_rowcount_row_id(table, row_id)
-    # function_result = 50  # foorccec a  faai
+    # function_result = 50  # force a fail
 
     # Compare sample data to function result set
     assert(test_sample_batch_to_check == function_result)
 
-    # >>> select_rowcount_row_id(table, row_id)
+
+def test_batch_total():
+    pass
+    # Initialize, create batch and load JE's into journal_loader for batch
+
+    # Initialize tables
+    table_list = ['journal_loader',
+                  'journal_batch',
+                  ]
+
+    delete_status = query_initialize_000(table_list)
+    if delete_status[0] != 0:
+        raise Error('Table initialization failed at test_batch_total()')
+
+    # Create a batch
+    # Load journal_batch with sample data dictionary from test_queries
+    for _ in test_sample_batch10:
+        insert_new_batch_name(**_)
+
+    # Get row id for batch
+    # Use batch name from the sample batch loaded to get the batch row id.
+
+    journal_batch_name = test_sample_batch10[0]['journal_batch_name']
+
+    batch_row_id = get_journal_batch_row_id_by_name(journal_batch_name)
+
+    if batch_row_id[1] != 'OK':
+        raise Error('*** ERROR: test_batch_total not finding name')
+
+    # Load sample data into batch
+    # Set up csv file to use
+    filename = 'csv_out01.csv'
+    table = 'journal_loader'
+    print(f'>>>> batch_row_id out: {batch_row_id}')
+    batch_row_id = batch_row_id[0][0][0]
+    # batch_row_id = batch_row_id[0][0][0]  <<< use to test malformed query
+
+    # Load csv file to journal_loader
+    load_file = batch_load_je_file(filename, str(batch_row_id))
+
+    if load_file == 'LOAD OKAY':
+        status_ = 1
+    else:
+        status_ = 99
+    assert(status_ == 1)
+
+    # Call function to test
+    journal_txt, journal_DR_total, journal_CR_total = batch_total(table, batch_row_id)
+
+    # Load csv file inro pandas dataframe
+    df = pd.read_csv(working_data_folder + filename)
+    print(df.head())
+    print(f'batch_row_id: {batch_row_id}')
+
+    # Get DR/CR totals in dataframe
+    df_dr_total = df['journal_debit'].sum()
+    df_cr_total = df['journal_credit'].sum()
+
+    # Compare sample data to function result set
+    assert(round(df_dr_total, 2) == round(journal_DR_total, 2))
+    assert(round(df_cr_total, 2) == round(journal_CR_total, 2))
 
 
 if __name__ == '__main__':
 
     """Test the select all rows query"""
-
     # table = 'chart_of_accounts'
     table = 'journal_batch'
     result_set = select_all(table)
