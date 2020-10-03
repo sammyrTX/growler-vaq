@@ -25,11 +25,12 @@ from .. database.sql_queries.queries_read import (select_all,
                                                   select_rowcount_row_id,
                                                   # select_batch_id,
                                                   batch_total,
-                                                  select_entity_name_by_id,
-                                                  select_entity_list,
+                                                  # select_entity_name_by_id,
+                                                  # select_entity_list,
                                                   get_gl_batch_status,
                                                   get_journal_batch_row_id_by_name,
                                                   batch_total,
+                                                  get_gl_batch_status,
                                                   )
 
 from .. database.sql_queries.queries_insert import (batch_load_je_file,
@@ -56,15 +57,16 @@ Current READ queries:
 *** def select_batch_loaded(table):
 *** def select_batch_available(table):
 *** def select_batch_by_row_id(table, journal_batch_row_id):
-*** def select_je_by_row_id(table, row_id): (*deleted, not being used*)
 *** def select_rowcount_row_id(table, row_id):
-*** def select_batch_id(table, journal_batch_row_id): (*deleted, not being
-    used*)
 *** def batch_total(table, batch_row_id):
 
-def select_entity_name_by_id(table, journal_batch_entity):
-def select_entity_list():
-def get_gl_batch_status(journal_batch_row_id):
+
+--- def select_je_by_row_id(table, row_id): (*deleted, not being used*)
+--- def select_batch_id(table, journal_batch_row_id): (*deleted, not being
+    used*)
+--- def select_entity_name_by_id(table, journal_batch_entity): (*Not Used*)
+--- def select_entity_list(): (*Not Used*)
+--- def get_gl_batch_status(journal_batch_row_id): (*Not Used*)
 """
 
 # Values to be used within scope of test_sql_read.py

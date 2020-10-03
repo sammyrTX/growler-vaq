@@ -123,31 +123,31 @@ def batch_total(table, batch_row_id):
                 888888,  #  Make different so flagged as not ready to post
                 )
 
+# Not being used, but keeping code for possible future use
+# def select_entity_name_by_id(table, journal_batch_entity):
+#     """Select the corresponding entity name for the given entity id from the
+#     journal entry batch.
+#     """
 
-def select_entity_name_by_id(table, journal_batch_entity):
-    """Select the corresponding entity name for the given entity id from the
-    journal entry batch.
-    """
+#     connection = create_connection(**config)
 
-    connection = create_connection(**config)
+#     select_entity = """SELECT entity_name FROM """ + table + """ WHERE entity_id = """ + str(journal_batch_entity) + """;"""
 
-    select_entity = """SELECT entity_name FROM """ + table + """ WHERE entity_id = """ + str(journal_batch_entity) + """;"""
+#     return execute_read_query(connection, select_entity)
 
-    return execute_read_query(connection, select_entity)
+#     currency__ = Currency.query.filter_by(currency_id=batch_currency).first()
 
-    currency__ = Currency.query.filter_by(currency_id=batch_currency).first()
+# Not being used, but keeping code for possible future use
+# def select_entity_list():
+#     """Select all the rows from the entity table and the corresponding
+#     currency names from the currency table. This can be used to populate a
+#     drop down table."""
 
+#     connection = create_connection(**config)
 
-def select_entity_list():
-    """Select all the rows from the entity table and the corresponding
-    currency names from the currency table. This can be used to populate a
-    drop down table."""
+#     select_all_entities = """SELECT e.*, c.currency_code FROM entity e, currency c WHERE e.currency_id = c.currency_id ORDER BY e.entity_id"""
 
-    connection = create_connection(**config)
-
-    select_all_entities = """SELECT e.*, c.currency_code FROM entity e, currency c WHERE e.currency_id = c.currency_id ORDER BY e.entity_id"""
-
-    return execute_read_query(connection, select_all_entities)
+#     return execute_read_query(connection, select_all_entities)
 
 
 def get_gl_batch_status(journal_batch_row_id):
