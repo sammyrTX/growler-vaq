@@ -19,12 +19,12 @@ from ... database.db_connection import (create_connection,
 from ... database.sql_queries.queries_read import (select_all,
                                                    select_batch_available,
                                                    select_batch_loaded,
-                                                   select_entity_name_by_id,
+                                                   # select_entity_name_by_id,
                                                    select_batch_by_row_id,
                                                    batch_total,
                                                    # select_je_by_row_id,
                                                    select_rowcount_row_id,
-                                                   select_entity_list,
+                                                   # select_entity_list,
                                                    )
 
 from ... database.sql_queries.queries_insert import (insert_new_batch_name,
@@ -207,7 +207,13 @@ def create_batch():
 
     form = BatchEntryForm()
 
-    entity_list = select_entity_list()
+    entity_list = [(1, 'North America', 1, 'USD'),  # Use this list for now
+                   (2, 'UK - London', 2, 'GBP'),
+                   ]
+
+    # Call to deactivated function that retrieves entity info and currency code
+    # May be able to remove if not needed in future versions.
+    # entity_list = select_entity_list()
 
     if form.validate_on_submit():
         # Insert new batch data into journal_batch table

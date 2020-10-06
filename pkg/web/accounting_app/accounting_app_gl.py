@@ -18,7 +18,7 @@ from ... database.db_connection import (create_connection,
 
 from ... database.sql_queries.queries_read import (select_all,
                                                    select_batch_available,
-                                                   select_entity_name_by_id,
+                                                   # select_entity_name_by_id,
                                                    select_batch_by_row_id,
                                                    batch_total,
                                                    )
