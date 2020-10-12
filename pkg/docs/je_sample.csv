@@ -1,0 +1,13 @@
+journal_id,journal_date,account_number,department_number,journal_entry_type,journal_debit,journal_credit,journal_description,journal_reference,journal_batch_row_id,gl_post_reference,journal_entity,journal_currency
+,2019-11-01,6070,500,99,589.97,0,sample transaction – expense-00,ref sample,2,,1,1
+,2019-11-01,6070,500,99,46.33,0,sample transaction – expense-01,ref sample,2,,1,1
+,2019-11-05,6070,500,99,901.33,0,sample transaction – expense-02,ref sample,2,,1,1
+,2019-11-01,2100,500,99,0,589.97,sample transaction – expense-00 AP,ref sample,2,,1,1
+,2019-11-01,2100,500,99,0,46.33,sample transaction – expense-01 AP,ref sample,2,,1,1
+,2019-11-05,2100,500,99,0,901.33,sample transaction – expense-02 AP,ref sample,2,,1,1
+,2019-11-01,2100,500,99,17.66,0,sample transaction – expense-00 AP – PAID,ref sample,2,,1,1
+,2019-11-01,2100,500,99,256.44,0,sample transaction – expense-01 AP – PAID,ref sample,2,,1,1
+,2019-11-05,2100,500,99,51.51,0,sample transaction – expense-02 AP – PAID,ref sample,2,,1,1
+,2019-11-01,2100,500,99,0,17.66,sample transaction – expense-00 AP – PAID,ref sample,2,,1,1
+,2019-11-01,2100,500,99,0,256.44,sample transaction – expense-01 AP – PAID,ref sample,2,,1,1
+,2019-11-05,2100,500,99,0,51.51,sample transaction – expense-02 AP – PAID,ref sample,2,,1,1
