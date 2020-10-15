@@ -1,6 +1,6 @@
 ## Load journal entry csv file
 
-# Steps to load a journal entry csv file into the journal table
+### Steps to load a journal entry csv file into the journal table
 
 1. On navigation bar, go to Journals > Create Journal Batch
        - Enter batch information and then click on the 'Create Batch' button.
