@@ -1,137 +1,86 @@
 # test_sql_read.py
 
-"""Test SQL read queries."""
+"""Test SQL read queries
+
+    In order to run tests, run the following on the command line:
+       <project_root_directory>$ python3 -m pytest -v
+"""
+
 
 import mysql.connector
 from mysql.connector import Error
-from .. database.db_config import config
-
+from .. database.db_config import config, working_data_folder
 from .. database.db_connection import (create_connection,
                                        execute_query,
                                        execute_read_query,
                                        )
 
-from .. database.db_config import config
-
 from .. database.sql_queries import queries_read
 
+from .. database.sql_queries.queries_read import (select_all,
+                                                  select_batch_available,
+                                                  select_batch_loaded,
+                                                  select_batch_by_row_id,
+                                                  # select_je_by_row_id,
+                                                  select_rowcount_row_id,
+                                                  # select_batch_id,
+                                                  batch_total,
+                                                  # select_entity_name_by_id,
+                                                  # select_entity_list,
+                                                  get_gl_batch_status,
+                                                  get_journal_batch_row_id_by_name,
+                                                  batch_total,
+                                                  get_gl_batch_status,
+                                                  )
 
-def select_all(table):
-    """select all rows from a given table"""
-    connection = create_connection(**config)
+from .. database.sql_queries.queries_insert import (batch_load_je_file,
+                                                    insert_new_batch_name,
+                                                    batch_load_insert,
+                                                    insert_je_row,
+                                                    )
 
-    select_accts = "SELECT * FROM " + table
+from . test_queries import (query_initialize_000,
+                            load_csv_to_journal,
+                            get_batch_row_id_in_journal,
+                            test_sample_batches,
+                            test_sample_batch00,
+                            test_sample_batch01,
+                            test_sample_batch10,
+                            )
 
-    return execute_read_query(connection, select_accts)
+import pandas as pd
 
+"""
+Current READ queries:
 
-def select_batch_available(table):
-    """select all rows from journal_batch table that have not been posted
-    to the General Ledger (i.e. batch status not equal to 3)."""
-    connection = create_connection(**config)
-
-    select_batch = """SELECT * FROM """ + table + """ WHERE gl_batch_status <> 3 ORDER BY journal_batch_row_id DESC;"""
-
-    print(f'{select_batch}')
-
-    return execute_read_query(connection, select_batch)
-
-
-def select_batch_by_row_id(table, journal_batch_row_id):
-    """Select row(s) from a table for a specific batch joining
-    on journal_batch_row_id."""
-
-    connection = create_connection(**config)
-
-    print('******* in select_batch_by_id function **********')
-
-    select_batch = """SELECT * FROM """ + table + """ WHERE journal_batch_row_id = """ + str(journal_batch_row_id) + """;"""
-
-    return execute_read_query(connection, select_batch)
-
-
-def select_je_by_row_id(table, row_id):
-    """Select row(s) from a table for a specific je joining
-    on journal_row_id."""
-
-    # Set field depending on which table is being passed
-    if table == 'journal_loader':
-        row_field = 'journal_loader_id'
-    elif table == 'journal':
-        row_field = 'journal_row_id'
-    else:
-        row_field = 'table_not_found'
-
-    connection = create_connection(**config)
-
-    select_je = """SELECT * FROM """ + table + """ WHERE """ + row_field + """ = """ + str(row_id) + """;"""
-
-    print(f'>>>>>>>>> select_je: {select_je}')
-
-    return execute_read_query(connection, select_je)
+*** def select_all(table):
+*** def select_batch_loaded(table):
+*** def select_batch_available(table):
+*** def select_batch_by_row_id(table, journal_batch_row_id):
+*** def select_rowcount_row_id(table, row_id):
+*** def batch_total(table, batch_row_id):
 
 
-def select_batch_id(table, journal_batch_row_id):
-    """**** REVIEW  - May not need this function **** Get the batch_id from a journal table. One use is to obtain the batch id for transactions loaded into the journals_loader table."""
+--- def select_je_by_row_id(table, row_id): (*deleted, not being used*)
+--- def select_batch_id(table, journal_batch_row_id): (*deleted, not being
+    used*)
+--- def select_entity_name_by_id(table, journal_batch_entity): (*Not Used*)
+--- def select_entity_list(): (*Not Used*)
+--- def get_gl_batch_status(journal_batch_row_id): (*Not Used*)
+"""
 
-    connection = create_connection(**config)
-
-    select_batch_id = """SELECT journal_batch_id FROM """ + table + """ GROUP BY journal_batch_id;"""
-
-    return execute_read_query(connection, select_batch_id)
-
-
-def batch_total(table, batch_row_id):
-
-    """For a given batch, total the debits and credits
-    """
-
-    connection = create_connection(**config)
-
-    dr_cr_totals_query = """SELECT journal_batch_row_id, sum(journal_debit), sum(journal_credit) FROM """ + table + """ WHERE journal_batch_row_id = '""" + str(batch_row_id) + """' GROUP BY journal_batch_row_id"""
-
-    dr_cr_totals = execute_read_query(connection, dr_cr_totals_query)
-    dr_cr_totals_list = list(dr_cr_totals)
-
-    if dr_cr_totals is None:
-
-        # Make DR != CR so HTML flags it as not ready to post to GL
-        print("FUNC: batch_total >>> ERROR", 999999, 888888)
-        return ("ERROR", 999999, 888888)
-
-    try:
-        print(f"FUNC: batch_total - journal_batch_row_id >>> {dr_cr_totals_list[0][0]}")
-        print(f"FUNC: batch_total  - dr total >>> {dr_cr_totals_list[0][1]}")
-        print(f"FUNC: batch_total - cr total >>> {dr_cr_totals_list[0][2]}")
-
-        return (dr_cr_totals_list[0][0],
-                dr_cr_totals_list[0][1],
-                dr_cr_totals_list[0][2],
-                )
-    except IndexError:
-        print("IndexError!")
-        return ("INDEX ERROR",
-                999999,
-                888888,  #  Make different so flagged as not ready to post
-                )
-
-
-def select_entity_name_by_id(table, journal_batch_entity):
-    """Select the corresponding entity name for the given entity id from the
-    journal entry batch.
-    """
-
-    connection = create_connection(**config)
-
-    select_entity = """SELECT entity_name FROM """ + table + """ WHERE entity_id = """ + str(journal_batch_entity) + """;"""
-
-    return execute_read_query(connection, select_entity)
-
-    currency__ = Currency.query.filter_by(currency_id=batch_currency).first()
+# Values to be used within scope of test_sql_read.py
+test_filename = 'csv_out00.csv'
+test_journal_batch_name = 'pytest-test_csv_load9'
+test_journal_batch_description = 'csv_out00.csv'
+test_journal_batch_entity = 1
+test_journal_batch_currency = 1
+test_gl_post_reference = 'NULL'
+test_gl_batch_status = 0
 
 # Test functions to be used with pytest
-
 value = 4000
+
 
 def test_value():
     value_to_test = 4000
@@ -139,33 +88,304 @@ def test_value():
     assert(value == value_to_test)
 
 
-def test_query():
-    pass
-    table = 'chart_of_accounts'
+def test_select_all():
+    """Check row count from select_all function"""
+
+    table = 'z_test_table_00'
+    test_row_0 = (1, 'sample', 11.99)
     rows = select_all(table)
-    # row_count = rows.count('\n')
-    row_count = 0
+    rows_count = len(rows)
+    test_value = 6
 
-    for _ in rows:
-        row_count +=1
-
-    assert(row_count > 0)
+    assert(rows_count == test_value)
+    assert(rows[0] == test_row_0)
 
 
-def test_query02():
-    test_value = (9, 'hotel-072820', 'hotel batch - test', 1, 1, 'NEED GL POST REF', 1)
+def test_select_batch_available():
+    """Check batches that should be available. gl_batch_status should
+       not equal 20."""
+
+    # Clear journal_batch table
+    table_list = ['journal_batch']
+    delete_status = query_initialize_000(table_list)
+    if delete_status[0] == 0:
+        print('table initialization completed successfully')
+    else:
+        raise Exception(f'initialization of {table_list} failed')
+
+    # Create test batches
+    test_batch_name = [['batch000', 20],
+                       ['batch001', 20],
+                       ['batch002', 0],
+                       ['batch003', 20],
+                       ['batch004', 0],
+                       ['batch005', 99],
+                       ]
+
+    batch_info = dict()
+
+    for _ in test_batch_name:
+        batch_info['journal_batch_name'] = _[0]
+        batch_info['journal_batch_description'] = _[0] + ' - No csv file'
+        batch_info['journal_batch_entity'] = '1'
+        batch_info['journal_batch_currency'] = '1'
+        batch_info['gl_post_reference'] = 'NULL'
+        batch_info['gl_batch_status'] = str(_[1])
+
+        insert_new_batch_name(**batch_info)
+
+    # Put batch row id's that are not a status of 20 in a list
+    test_batch_avail = list()
+
+    for _ in test_batch_name:
+        if _[1] != 20:
+            row_ = get_journal_batch_row_id_by_name(_[0])
+            test_batch_avail.append(row_[0][0][0])
+
+    # Execute select_batch_available; put batch row id's in a list
     table = 'journal_batch'
-    journal_batch_row_id = 9
-    row = select_batch_by_row_id(table, journal_batch_row_id)
-    row = row[0]
+    available_batches = select_batch_available(table)
 
-    assert(row == test_value)
+    available_batches_row_ids = list()
+
+    for _ in available_batches:
+        available_batches_row_ids.append(_[0])
+
+    # Test result set
+    assert(test_batch_avail.sort() == available_batches_row_ids.sort())
+
+
+def test_select_batch_loaded():
+    """Check if select_batch_loaded function is gathering batches that have associated journal table rows.
+    """
+
+    # Initialize journal_batch, journal_loader and journal by deleting all
+    # rows from each table
+
+    table_list = ['journal_batch',
+                  'journal_loader',
+                  'journal',
+                  ]
+
+    initialize_result = query_initialize_000(table_list)
+
+    if initialize_result[0] != 0:
+        print(initialize_result[1])
+        raise Exception('Table initialization error')
+    else:
+        print(f'initialization: {initialize_result[1]}')
+
+    # Process batches and csv file data through journal load stage.
+
+    # List of batch name(s) to use
+    batch_names = ['check000',
+                   'check001',
+                   ]
+
+    csv_files = ['je_load_kilo.csv',
+                 'je_load_kilo.csv',
+                 ]
+
+    batches_loaded = list()
+
+    for idx, _ in enumerate(batch_names):
+        batch_info = dict()
+
+        batch_info['filename'] = csv_files[idx]
+        batch_info['journal_batch_name'] = _
+        batch_info['journal_batch_description'] = csv_files[idx]
+        batch_info['journal_batch_entity'] = 1
+        batch_info['journal_batch_currency'] = 1
+        batch_info['gl_post_reference'] = 'NULL'
+        batch_info['gl_batch_status'] = 0
+
+        batch_info_out = load_csv_to_journal(batch_info)
+        print(f'batch_info_out: {batch_info_out}')
+        batches_loaded.append(batch_info_out)
+
+    # Confirm each csv loaded is okay
+
+    batches_loaded_status = 0
+    batches_loaded_check = list()
+
+    for _ in batches_loaded:
+        if _[0] == 0:
+            batches_loaded_status = 0
+            batches_loaded_check.append(_[1])
+        else:
+            batches_loaded_status = 99
+
+    if batches_loaded_status == 0:
+        #Check if batches have corresponding rows in the journal table
+
+        batch_row_id = batches_loaded[0]
+        print(f'batch_row_id ::: {batch_row_id}')
+
+        batches_in_journal = get_batch_row_id_in_journal(batch_row_id)
+        batches_in_journal_check = [batches_in_journal[0][0], batches_in_journal[1][0]]
+
+        assert(batches_loaded_check == batches_in_journal_check)
+
+    else:
+        # Raise exception if the status from load_csv_to_journal is not
+        # zero for either batch.
+        raise Exception('Error in csv to journal load process')
+
+
+def test_select_batch_by_row_id():
+    # Initialize journal_batch table before inserting sample rows
+    table_list = ['journal_batch']
+    delete_status = query_initialize_000(table_list)
+    if delete_status[0] != 0:
+        raise Error('Table initialization failed at test_select_batch_by_row_id()')
+
+    # Load journal_batch with sample data dictionary from test_queries
+    for _ in test_sample_batches:
+        insert_new_batch_name(**_)
+
+    # Use an arbitrary batch name from the sample batches loaded to get the
+    # batch row id.
+
+    journal_batch_name = test_sample_batches[3]['journal_batch_name']
+
+    batch_row_id = get_journal_batch_row_id_by_name(journal_batch_name)
+
+    if batch_row_id[1] != 'OK':
+        raise Error('*** ERROR: test_select_batch_by_row_id not finding name')
+
+    # Put contents of test sample batch from dict into a list for later assert
+    test_sample_batch_to_check = list()
+    test_sample_batch_to_check.append(batch_row_id[0][0][0])
+
+    for key in test_sample_batches[3]:
+        test_sample_batch_to_check.append(test_sample_batches[3][key])
+
+    # Convert entity, currency & batch status to int
+    test_sample_batch_to_check[3] = int(test_sample_batch_to_check[3])
+    test_sample_batch_to_check[4] = int(test_sample_batch_to_check[4])
+    test_sample_batch_to_check[6] = int(test_sample_batch_to_check[6])
+
+    # Call select_batch_by_row_id and store result set
+    table = 'journal_batch'
+    journal_batch_row_id = batch_row_id[0][0][0]
+    function_result = select_batch_by_row_id(table, journal_batch_row_id)
+
+    # Compare sample data to function result set
+    assert(test_sample_batch_to_check == list(function_result[0]))
+
+
+def test_select_rowcount_row_id():
+    # row count from test_queries.test_sample_batch01
+    test_sample_batch_to_check = 3
+
+    # Initialize tables to test before inserting sample rows
+    table_list = ['journal_loader',
+                  'journal_batch',
+                  'journal',
+                  ]
+
+    delete_status = query_initialize_000(table_list)
+    if delete_status[0] != 0:
+        raise Error('Table initialization failed at test_select_batch_by_row_id()')
+
+    # Populate test tables with data
+    # Load journal_batch with sample data dictionary from test_queries
+    for _ in test_sample_batch00:
+        insert_new_batch_name(**_)
+
+    # Get the batch row id for "test_batch_100"
+    journal_batch_name = 'test_batch_100'
+    test_batch_row = get_journal_batch_row_id_by_name(journal_batch_name)
+    print(f'test_batch_row: {test_batch_row}')
+    print(f'test_batch_row[0][0]: {test_batch_row[0][0]}')
+    print(f'test_batch_row[0][0][0]: {test_batch_row[0][0][0]}')
+    test_journal_batch_row_id = test_batch_row[0][0][0]
+
+    # Load journal_loader with sample data dictionary from test_queries
+    # *** Need to pass the journal_batch_row_id from sample batch created
+
+    table = 'journal_loader'
+    row_id = test_journal_batch_row_id
+    for _ in test_sample_batch01:
+        _['journal_batch_row_id'] = row_id
+        load_status = insert_je_row(table, **_)
+        if load_status != 0:
+            print('*** ERROR at test_select_rowcount_row_id() ***')
+            break
+
+    # call select_rowcount_row_id function
+    function_result = select_rowcount_row_id(table, row_id)
+    # function_result = 50  # force a fail
+
+    # Compare sample data to function result set
+    assert(test_sample_batch_to_check == function_result)
+
+
+def test_batch_total():
+    pass
+    # Initialize, create batch and load JE's into journal_loader for batch
+
+    # Initialize tables
+    table_list = ['journal_loader',
+                  'journal_batch',
+                  ]
+
+    delete_status = query_initialize_000(table_list)
+    if delete_status[0] != 0:
+        raise Error('Table initialization failed at test_batch_total()')
+
+    # Create a batch
+    # Load journal_batch with sample data dictionary from test_queries
+    for _ in test_sample_batch10:
+        insert_new_batch_name(**_)
+
+    # Get row id for batch
+    # Use batch name from the sample batch loaded to get the batch row id.
+
+    journal_batch_name = test_sample_batch10[0]['journal_batch_name']
+
+    batch_row_id = get_journal_batch_row_id_by_name(journal_batch_name)
+
+    if batch_row_id[1] != 'OK':
+        raise Error('*** ERROR: test_batch_total not finding name')
+
+    # Load sample data into batch
+    # Set up csv file to use
+    filename = 'csv_out01.csv'
+    table = 'journal_loader'
+    print(f'>>>> batch_row_id out: {batch_row_id}')
+    batch_row_id = batch_row_id[0][0][0]
+    # batch_row_id = batch_row_id[0][0][0]  <<< use to test malformed query
+
+    # Load csv file to journal_loader
+    load_file = batch_load_je_file(filename, str(batch_row_id))
+
+    if load_file == 'LOAD OKAY':
+        status_ = 1
+    else:
+        status_ = 99
+    assert(status_ == 1)
+
+    # Call function to test
+    journal_txt, journal_DR_total, journal_CR_total = batch_total(table, batch_row_id)
+
+    # Load csv file inro pandas dataframe
+    df = pd.read_csv(working_data_folder + filename)
+    print(df.head())
+    print(f'batch_row_id: {batch_row_id}')
+
+    # Get DR/CR totals in dataframe
+    df_dr_total = df['journal_debit'].sum()
+    df_cr_total = df['journal_credit'].sum()
+
+    # Compare sample data to function result set
+    assert(round(df_dr_total, 2) == round(journal_DR_total, 2))
+    assert(round(df_cr_total, 2) == round(journal_CR_total, 2))
 
 
 if __name__ == '__main__':
 
     """Test the select all rows query"""
-
     # table = 'chart_of_accounts'
     table = 'journal_batch'
     result_set = select_all(table)
@@ -191,5 +411,39 @@ if __name__ == '__main__':
     else:
         print(f'Result set is not empty')
 
+    print('*' * 60)
+
+    check_output = select_all('z_test_table_00')
+    print('check_output:')
+    print(f'{check_output}')
+    print(f'items in check_output: {len(check_output)}')
+    print('*' * 60)
 
     print('*' * 60)
+
+    check_output = select_batch_available('z_test_journal_batch')
+    print('check_output:')
+    print(f'{check_output}')
+    print(f'items in check_output: {len(check_output)}')
+    print('*' * 60)
+
+    print('*' * 60)
+
+    check_output = select_batch_loaded('z_test_journal_batch')
+    print('check_output:')
+    print(f'{check_output}')
+    print(f'items in check_output: {len(check_output)}')
+
+    print('*' * 60)
+
+    print('>' * 90)
+    print()
+    try:
+        cnx = create_connection(**config)
+        cursor = cnx.cursor()
+        cursor.execute("SELECT * FORM employees")   # Syntax error in query
+        cnx.close()
+    except mysql.connector.Error as err:
+        print(f'Something went wrong: {err}')
+    print()
+    print('<' * 90)

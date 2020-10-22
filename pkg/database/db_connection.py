@@ -19,6 +19,8 @@ def create_connection(user, password, host, database):
         print("Connection to MySQL DB successful")
     except ConnectionError as e:
         print(f"The connection error '{e}' occurred")
+    except mysql.connector.Error as err:
+        print(f'Something went wrong: {err}')
     except Error as e:
         print(f"The error '{e}' occurred")
 
@@ -28,15 +30,14 @@ def create_connection(user, password, host, database):
 def execute_query(connection, query):
     """Execute a SQL query passed as an argument"""
 
-    # test
-    print(f'query argument: {query}')
     cursor = connection.cursor()
     try:
         cursor.execute(query)
         connection.commit()
-        print("Query executed successfully")
+        cursor.close()
+        return "Query executed successfully"
     except Error as e:
-        print(f"The error '{e}' occurred")
+        return f'The error "{e}" occurred'
 
 
 def execute_read_query(connection, query):

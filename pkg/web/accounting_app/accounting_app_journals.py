@@ -19,12 +19,12 @@ from ... database.db_connection import (create_connection,
 from ... database.sql_queries.queries_read import (select_all,
                                                    select_batch_available,
                                                    select_batch_loaded,
-                                                   select_entity_name_by_id,
+                                                   # select_entity_name_by_id,
                                                    select_batch_by_row_id,
                                                    batch_total,
-                                                   select_je_by_row_id,
+                                                   # select_je_by_row_id,
                                                    select_rowcount_row_id,
-                                                   select_entity_list,
+                                                   # select_entity_list,
                                                    )
 
 from ... database.sql_queries.queries_insert import (insert_new_batch_name,
@@ -93,7 +93,7 @@ def load_batch(batch_row_id):
         # load CSV data into staging table (journal_loader)
         load_file = batch_load_je_file(filename, batch_row_id)
 
-        if load_file == "LOAD OK":
+        if load_file == "LOAD OKAY":
             return redirect(url_for('accounting_app_journals_bp.journal_loader_batch_review', batch_row_id=batch_row_id))
         else:
             return render_template('accounting_app_journals_bp/load_error.html')
@@ -123,8 +123,7 @@ def journal_loader_to_journal(batch_row_id):
 
     load_status = batch_load_insert(batch_row_id)
 
-    if load_status == "journal_load to journal INSERT COMPLETE":
-
+    if load_status == 0:
         return redirect(url_for('accounting_app_journals_bp.journal_loader_batch_review', batch_row_id=batch_row_id))
     else:
         return render_template('journals/journal_batch_load_error.html')
@@ -149,9 +148,10 @@ def journal_loader_batch_review(batch_row_id):
     batch_name = journal_batch_row[0][1]
 
     # Check if the gl_batch_status is zero which indicates it is new with no
-    # data loaded or if the row count is zero
+    # data loaded or if there are no corresponding rows in journal_loader
+    # table indicating no csv file has been loaded to the staging table.
 
-    if journal_batch_row[0][6] == 0 or select_rowcount_row_id(journal_batch_table, batch_row_id) == 0:
+    if journal_batch_row[0][6] == 0 or select_rowcount_row_id(journal_loader_table, batch_row_id) == 0:
 
         # Set to a 'no rows' status
         je_source = 'New batch'
@@ -207,7 +207,13 @@ def create_batch():
 
     form = BatchEntryForm()
 
-    entity_list = select_entity_list()
+    entity_list = [(1, 'North America', 1, 'USD'),  # Use this list for now
+                   (2, 'UK - London', 2, 'GBP'),
+                   ]
+
+    # Call to deactivated function that retrieves entity info and currency code
+    # May be able to remove if not needed in future versions.
+    # entity_list = select_entity_list()
 
     if form.validate_on_submit():
         # Insert new batch data into journal_batch table

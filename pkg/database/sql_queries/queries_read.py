@@ -11,6 +11,9 @@ from .. db_connection import (create_connection,
 
 from .. db_config import config
 
+import mysql.connector
+from mysql.connector import Error
+
 
 def select_all(table):
     """select all rows from a given table"""
@@ -26,23 +29,22 @@ def select_batch_available(table):
     to the journal table (i.e. batch status not equal to 20)."""
     connection = create_connection(**config)
 
-    select_batch = """SELECT * FROM """ + table + """ WHERE gl_batch_status in (0, 10) ORDER BY journal_batch_row_id DESC;"""
+    select_batch = """SELECT * FROM """ + table + """ WHERE gl_batch_status <> 20 ORDER BY journal_batch_row_id DESC;"""
 
     print(f'{select_batch}')
 
     return execute_read_query(connection, select_batch)
 
 
-# ***** NEED TO HANDLE EMPTY RESULT SET *****    #TODO
 def select_batch_loaded(table):
-    """select all rows from journal_batch table that have been posted
-    to the journal table (i.e. batch status equal to 20). Include the total of debits and credits from the journal table."""
+    """Select all rows from journal_batch table that have been posted
+    to the journal table.
+
+    This is an inner join on journal_batch.journal_batch_row_id to journal table rows that have the same journal_batch_row_id. Include the total of debits and credits from the journal table. This query will select rows from journal table regardless of gl_batch_status (which should be 20 if posted to the journal table."""
 
     connection = create_connection(**config)
 
-    # select_batch = """SELECT * FROM """ + table + """ WHERE gl_batch_status = 20 ORDER BY journal_batch_row_id DESC;"""
-
-    select_batch = """SELECT b.journal_batch_row_id, b.journal_batch_name, b.journal_batch_description, j.journal_batch_row_id, sum(j.journal_debit) as DR, sum(j.journal_credit) as CR FROM journal j, journal_batch b WHERE j.journal_batch_row_id = b.journal_batch_row_id group by j.journal_batch_row_id"""
+    select_batch = """SELECT b.journal_batch_row_id, b.journal_batch_name, b.journal_batch_description, j.journal_batch_row_id, sum(j.journal_debit) as DR, sum(j.journal_credit) as CR FROM journal j, """ + table + """ b WHERE j.journal_batch_row_id = b.journal_batch_row_id GROUP BY j.journal_batch_row_id ORDER BY j.journal_batch_row_id DESC"""
 
     print(f'{select_batch}')
 
@@ -50,37 +52,18 @@ def select_batch_loaded(table):
 
 
 def select_batch_by_row_id(table, journal_batch_row_id):
-    """Select row(s) from a table for a specific batch joining
-    on journal_batch_row_id."""
+    """Select row(s) from a table for a specific batch based
+    on journal_batch_row_id.
+    """
 
     connection = create_connection(**config)
 
-    print('******* in select_batch_by_id function **********')
+    print('******* in select_batch_by_row_id function **********')
 
     select_batch = """SELECT * FROM """ + table + """ WHERE journal_batch_row_id = """ + str(journal_batch_row_id) + """;"""
 
+    print(f'select_batch: {select_batch}')
     return execute_read_query(connection, select_batch)
-
-
-def select_je_by_row_id(table, row_id):
-    """Select row(s) from a table for a specific je joining
-    on journal_row_id."""
-
-    # Set field depending on which table is being passed
-    if table == 'journal_loader':
-        row_field = 'journal_loader_id'
-    elif table == 'journal':
-        row_field = 'journal_row_id'
-    else:
-        row_field = 'table_not_found'
-
-    connection = create_connection(**config)
-
-    select_je = """SELECT * FROM """ + table + """ WHERE """ + row_field + """ = """ + str(row_id) + """;"""
-
-    print(f'>>>>>>>>> select_je: {select_je}')
-
-    return execute_read_query(connection, select_je)
 
 
 def select_rowcount_row_id(table, row_id):
@@ -92,6 +75,8 @@ def select_rowcount_row_id(table, row_id):
         row_field = 'journal_batch_row_id'
     elif table == 'journal':
         row_field = 'journal_row_id'
+    elif table == 'journal_batch':
+        row_field = 'journal_batch_row_id'
     else:
         row_field = 'table_not_found'
 
@@ -99,25 +84,14 @@ def select_rowcount_row_id(table, row_id):
 
     row_count = """SELECT count(*) FROM """ + table + """ WHERE """ + row_field + """ = """ + str(row_id) + """;"""
 
-    print(f'>>>>>>>>> row_count: {row_count}')
+    row_count_result = execute_read_query(connection, row_count)
 
-    return execute_read_query(connection, row_count)
-
-
-def select_batch_id(table, journal_batch_row_id):
-    """**** REVIEW  - May not need this function **** Get the batch_id from a journal table. One use is to obtain
-    the batch id for transactions loaded into the journals_loader table."""
-
-    connection = create_connection(**config)
-
-    select_batch_id = """SELECT journal_batch_id FROM """ + table + """ GROUP BY journal_batch_id;"""
-
-    return execute_read_query(connection, select_batch_id)
+    return row_count_result[0][0]
 
 
 def batch_total(table, batch_row_id):
 
-    """For a given batch, total the debits and credits
+    """For a given batch row id and table, total the debits and credits.
     """
 
     connection = create_connection(**config)
@@ -149,31 +123,31 @@ def batch_total(table, batch_row_id):
                 888888,  #  Make different so flagged as not ready to post
                 )
 
+# Not being used, but keeping code for possible future use
+# def select_entity_name_by_id(table, journal_batch_entity):
+#     """Select the corresponding entity name for the given entity id from the
+#     journal entry batch.
+#     """
 
-def select_entity_name_by_id(table, journal_batch_entity):
-    """Select the corresponding entity name for the given entity id from the
-    journal entry batch.
-    """
+#     connection = create_connection(**config)
 
-    connection = create_connection(**config)
+#     select_entity = """SELECT entity_name FROM """ + table + """ WHERE entity_id = """ + str(journal_batch_entity) + """;"""
 
-    select_entity = """SELECT entity_name FROM """ + table + """ WHERE entity_id = """ + str(journal_batch_entity) + """;"""
+#     return execute_read_query(connection, select_entity)
 
-    return execute_read_query(connection, select_entity)
+#     currency__ = Currency.query.filter_by(currency_id=batch_currency).first()
 
-    currency__ = Currency.query.filter_by(currency_id=batch_currency).first()
+# Not being used, but keeping code for possible future use
+# def select_entity_list():
+#     """Select all the rows from the entity table and the corresponding
+#     currency names from the currency table. This can be used to populate a
+#     drop down table."""
 
+#     connection = create_connection(**config)
 
-def select_entity_list():
-    """Select all the rows from the entity table and the corresponding
-    currency names from the currency table. This can be used to populate a
-    drop down table."""
+#     select_all_entities = """SELECT e.*, c.currency_code FROM entity e, currency c WHERE e.currency_id = c.currency_id ORDER BY e.entity_id"""
 
-    connection = create_connection(**config)
-
-    select_all_entities = """SELECT e.*, c.currency_code FROM entity e, currency c WHERE e.currency_id = c.currency_id ORDER BY e.entity_id"""
-
-    return execute_read_query(connection, select_all_entities)
+#     return execute_read_query(connection, select_all_entities)
 
 
 def get_gl_batch_status(journal_batch_row_id):
@@ -187,3 +161,23 @@ def get_gl_batch_status(journal_batch_row_id):
         return (99, 'Error - No journal batch row id found')
     else:
         return (gl_batch_status, 'OK')
+
+
+def get_journal_batch_row_id_by_name(journal_batch_name):
+    """Get the journal_batch_row_id by journal_batch_name"""
+
+    try:
+        connection = create_connection(**config)
+
+        row_id_qry = """SELECT journal_batch_row_id from journal_batch WHERE journal_batch_name = '""" + journal_batch_name + """'"""
+
+        row_id_out = execute_read_query(connection, row_id_qry)
+
+        if row_id_out is None:
+            return (0, 'Error - No journal batch row id found')
+        else:
+            row_id = row_id_out[0][0]
+            return (row_id_out, 'OK')
+    except Error:
+        print('*** ERROR ***')
+        return (99, '*** Error***')
