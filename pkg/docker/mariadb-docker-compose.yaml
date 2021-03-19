@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  mariadb:
+    image: mariadb:10.4.15
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=my-secret-pw
+    volumes:
+      - mariadb-data:/var/lib/mysql
+volumes:
+  mariadb-data:
+    driver: local
