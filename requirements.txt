@@ -42,4 +42,4 @@ urllib3==2.8.0
 URLObject==2.4.3
 Werkzeug==3.1.9
 WTForms==2.2.1
-zipp==3.1.0
+zipp==3.19.1
